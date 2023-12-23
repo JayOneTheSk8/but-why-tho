@@ -9,6 +9,7 @@ class Author < ApplicationRecord
   )
   validates(
     :username,
+    format: {with: /\A[\w\-\.]+\z/},
     presence: true,
     uniqueness: true,
     length: {maximum: 50}
