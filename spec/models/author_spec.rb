@@ -82,15 +82,15 @@ RSpec.describe Author do
     expect(author.email).to eq email.downcase
   end
 
-  # describe "#authenticate" do
-  #   let(:password) { "coolio" }
-  #   let!(:a) { create(:author, password:) }
+  describe "#authenticate" do
+    let(:password) { "coolio" }
+    let!(:a) { create(:author, password:) }
 
-  #   it "checks the password of the author" do
-  #     expect(a.authenticate(password)).to be_present
-  #     expect(a.authenticate("badpass")).to be_nil
-  #   end
-  # end
+    it "checks the password of the author" do
+      expect(a.authenticate(password)).to be_present
+      expect(a.authenticate("badpass")).to be false
+    end
+  end
 
   describe "#confirm!" do
     context "with confirmed_at" do
