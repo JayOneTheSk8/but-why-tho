@@ -1,4 +1,4 @@
-class Author < ApplicationRecord
+class User < ApplicationRecord
   CONFIRMATION_TOKEN_EXPIRATION = 10.minutes
 
   # Use password digest

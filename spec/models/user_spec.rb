@@ -1,18 +1,18 @@
 require "rails_helper"
 
-RSpec.describe Author do
-  let(:author) { build(:author) }
+RSpec.describe User do
+  let(:user) { build(:user) }
 
   describe "#valid?" do
     %i[
       email
       username
     ].each do |attr|
-      it "is invalid with a nil #{attr}" do
-        author.assign_attributes(attr => nil)
-        expect(author).not_to be_valid
+      it "is invalid with u nil #{attr}" do
+        user.assign_attributes(attr => nil)
+        expect(user).not_to be_valid
         expect(
-          author.errors.full_messages.map(&:downcase)
+          user.errors.full_messages.map(&:downcase)
         ).to include "#{attr} can't be blank"
       end
     end
@@ -31,9 +31,9 @@ RSpec.describe Author do
           bad@@email.com
           ba/d@email.com
         ].each do |email|
-          author.assign_attributes(email:)
-          expect(author).not_to be_valid
-          expect(author.errors.full_messages).to include "Email is invalid"
+          user.assign_attributes(email:)
+          expect(user).not_to be_valid
+          expect(user.errors.full_messages).to include "Email is invalid"
         end
       end
 
@@ -47,30 +47,30 @@ RSpec.describe Author do
           good@email.com-
           good@email.comm
         ].each do |email|
-          author.assign_attributes(email:)
-          expect(author).to be_valid
+          user.assign_attributes(email:)
+          expect(user).to be_valid
         end
       end
     end
 
     describe "username attribute" do
       it "does not allow username longer than 50 characters" do
-        author.assign_attributes(username: "x" * 51)
-        expect(author).not_to be_valid
+        user.assign_attributes(username: "x" * 51)
+        expect(user).not_to be_valid
         expect(
-          author.errors.full_messages
+          user.errors.full_messages
         ).to include "Username is too long (maximum is 50 characters)"
       end
 
       it "allows usernames with periods, hyphens, and underscores" do
-        author.assign_attributes(username: "-s0me_0ne.")
-        expect(author).to be_valid
+        user.assign_attributes(username: "-s0me_0ne.")
+        expect(user).to be_valid
       end
 
       it "does not allow usernames with other characters" do
         %w[? ! @ # $ % ^ & * ( ) + ~ / \\ ].each do |chr|
-          author.assign_attributes(username: "-s0me_0ne.#{chr}")
-          expect(author).not_to be_valid
+          user.assign_attributes(username: "-s0me_0ne.#{chr}")
+          expect(user).not_to be_valid
         end
       end
     end
@@ -78,38 +78,38 @@ RSpec.describe Author do
 
   it "lowers email upon save" do
     email = "Coolio1Nice@email.com"
-    author.update!(email:)
-    expect(author.email).to eq email.downcase
+    user.update!(email:)
+    expect(user.email).to eq email.downcase
   end
 
   describe "#authenticate" do
     let(:password) { "coolio" }
-    let!(:a) { create(:author, password:) }
+    let!(:u) { create(:user, password:) }
 
-    it "checks the password of the author" do
-      expect(a.authenticate(password)).to be_present
-      expect(a.authenticate("badpass")).to be false
+    it "checks the password of the user" do
+      expect(u.authenticate(password)).to be_present
+      expect(u.authenticate("badpass")).to be false
     end
   end
 
   describe "#confirm!" do
     context "with confirmed_at" do
-      let!(:a) { create(:author, :confirmed) }
+      let!(:u) { create(:user, :confirmed) }
 
       it "does nothing" do
-        expect { a.confirm! }.not_to change(a.reload, :confirmed_at)
+        expect { u.confirm! }.not_to change(u.reload, :confirmed_at)
       end
     end
 
     context "without confirmed_at" do
-      let!(:a) { create(:author, :unconfirmed) }
+      let!(:u) { create(:user, :unconfirmed) }
       let(:now) { Time.current }
 
       before { allow(Time).to receive(:current).and_return(now) }
 
       it "fills in the confirmed_at column with the current time" do
-        expect { a.confirm! }
-          .to change { a.reload.confirmed_at&.strftime("%FT%T.%6N") }
+        expect { u.confirm! }
+          .to change { u.reload.confirmed_at&.strftime("%FT%T.%6N") }
           .from(nil).to(now.strftime("%FT%T.%6N"))
       end
     end
@@ -117,77 +117,77 @@ RSpec.describe Author do
 
   describe "#confirmed?" do
     context "with confirmed_at" do
-      let!(:a) { create(:author, :confirmed) }
+      let!(:u) { create(:user, :confirmed) }
 
       it "returns true" do
-        expect(a.confirmed?).to be true
+        expect(u.confirmed?).to be true
       end
     end
 
     context "without confirmed_at" do
-      let!(:a) { create(:author, :unconfirmed) }
+      let!(:u) { create(:user, :unconfirmed) }
 
       it "returns false" do
-        expect(a.confirmed?).to be false
+        expect(u.confirmed?).to be false
       end
     end
   end
 
   describe "#unconfirmed?" do
     context "with confirmed_at" do
-      let!(:a) { create(:author, :confirmed) }
+      let!(:u) { create(:user, :confirmed) }
 
       it "returns false" do
-        expect(a.unconfirmed?).to be false
+        expect(u.unconfirmed?).to be false
       end
     end
 
     context "without confirmed_at" do
-      let!(:a) { create(:author, :unconfirmed) }
+      let!(:u) { create(:user, :unconfirmed) }
 
       it "returns true" do
-        expect(a.unconfirmed?).to be true
+        expect(u.unconfirmed?).to be true
       end
     end
   end
 
   describe "#generate_confirmation_token" do
     context "when unconfirmed" do
-      let!(:a) { create(:author, :unconfirmed) }
-      let(:token) { a.generate_confirmation_token }
+      let!(:u) { create(:user, :unconfirmed) }
+      let(:token) { u.generate_confirmation_token }
 
-      it "creates a signed id for the user's email confirmation" do
+      it "creates u signed id for the user's email confirmation" do
         expect(token).to be_present
-        expect(described_class.find_signed(token, purpose: :confirm_email)).to eq a
+        expect(described_class.find_signed(token, purpose: :confirm_email)).to eq u
       end
     end
 
     context "when confirmed" do
-      let!(:a) { create(:author, :confirmed) }
-      let(:token) { a.generate_confirmation_token }
+      let!(:u) { create(:user, :confirmed) }
+      let(:token) { u.generate_confirmation_token }
 
-      it "does not create a signed id" do
+      it "does not create u signed id" do
         expect(token).to be_nil
       end
     end
   end
 
   describe "scopes" do
-    let!(:a1) { create(:author, :unconfirmed) }
-    let!(:a2) { create(:author, :confirmed) }
-    let!(:a3) { create(:author, :unconfirmed) }
-    let!(:a4) { create(:author, :unconfirmed) }
-    let!(:a5) { create(:author, :confirmed) }
+    let!(:a1) { create(:user, :unconfirmed) }
+    let!(:a2) { create(:user, :confirmed) }
+    let!(:a3) { create(:user, :unconfirmed) }
+    let!(:a4) { create(:user, :unconfirmed) }
+    let!(:a5) { create(:user, :confirmed) }
 
     describe ".confirmed" do
-      it "returns the confirmed authors" do
+      it "returns the confirmed users" do
         expect(described_class.confirmed.order(:id).pluck(:id))
           .to eq [a2, a5].map(&:id)
       end
     end
 
     describe ".unconfirmed" do
-      it "returns the unconfirmed authors" do
+      it "returns the unconfirmed users" do
         expect(described_class.unconfirmed.order(:id).pluck(:id))
           .to eq [a1, a3, a4].map(&:id)
       end

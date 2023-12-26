@@ -1,5 +1,5 @@
 class Post < ApplicationRecord
-  belongs_to :author
+  belongs_to :user
 
   validates :text, presence: true, length: {maximum: 200}
 
