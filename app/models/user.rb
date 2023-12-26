@@ -4,6 +4,8 @@ class User < ApplicationRecord
   # Use password digest
   has_secure_password
 
+  has_many :posts, dependent: :destroy
+
   before_save :downcase_email
 
   validates(
