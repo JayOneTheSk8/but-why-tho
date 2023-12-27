@@ -13,6 +13,9 @@ Layout/SpaceInsideHashLiteralBraces:
 Metrics/BlockLength:
   Enabled: false
 
+Rails/I18nLocaleTexts:
+  Enabled: false
+
 RSpec/ExampleLength:
   Enabled: false
 
