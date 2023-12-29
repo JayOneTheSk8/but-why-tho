@@ -1,3 +1,6 @@
 class StaticPagesController < ApplicationController
-  def home; end
+  def home
+    @posts = Post.all
+    render :root
+  end
 end
