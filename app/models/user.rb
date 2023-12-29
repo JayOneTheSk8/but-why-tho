@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   CONFIRMATION_TOKEN_EXPIRATION = 10.minutes
+  MAILER_FROM_EMAIL = "no-reply@example.com".freeze # TODO: add real email address w/ full integration
 
   # Use password digest
   has_secure_password
