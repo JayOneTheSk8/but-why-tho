@@ -34,6 +34,10 @@ class User < ApplicationRecord
     confirmed_at.present?
   end
 
+  def unconfirmed?
+    !confirmed?
+  end
+
   def generate_confirmation_token
     return if confirmed?
 
@@ -41,8 +45,11 @@ class User < ApplicationRecord
     signed_id expires_in: CONFIRMATION_TOKEN_EXPIRATION, purpose: :confirm_email
   end
 
-  def unconfirmed?
-    !confirmed?
+  def send_confirmation_email!
+    return if confirmed?
+
+    confirmation_token = generate_confirmation_token
+    UserMailer.confirmation(self, confirmation_token).deliver_now
   end
 
   private

@@ -156,7 +156,7 @@ RSpec.describe User do
       let!(:u) { create(:user, :unconfirmed) }
       let(:token) { u.generate_confirmation_token }
 
-      it "creates u signed id for the user's email confirmation" do
+      it "creates a signed id for the user's email confirmation" do
         expect(token).to be_present
         expect(described_class.find_signed(token, purpose: :confirm_email)).to eq u
       end
@@ -166,8 +166,39 @@ RSpec.describe User do
       let!(:u) { create(:user, :confirmed) }
       let(:token) { u.generate_confirmation_token }
 
-      it "does not create u signed id" do
+      it "does not create a signed id" do
         expect(token).to be_nil
+      end
+    end
+  end
+
+  describe "#send_confirmation_email!" do
+    context "when unconfirmed" do
+      let!(:u) { create(:user, :unconfirmed) }
+      let(:token) { "abc123" }
+
+      before do
+        allow(u).to receive(:generate_confirmation_token).and_return(token)
+      end
+
+      it "sends a confirmation email" do
+        expect { u.send_confirmation_email! }.to change { UserMailer.deliveries.count }.by(1)
+      end
+
+      it "sends the generated confirmation token" do
+        mailer = double(:mailer)
+        allow(UserMailer).to receive(:confirmation).with(u, token).and_return(mailer)
+        expect(mailer).to receive(:deliver_now)
+        u.send_confirmation_email!
+      end
+    end
+
+    context "when confirmed" do
+      let!(:u) { create(:user, :confirmed) }
+
+      it "does not send a confirmation email" do
+        expect { u.send_confirmation_email! }.not_to change(UserMailer.deliveries, :count)
+        expect(u).not_to receive(:generate_confirmation_token)
       end
     end
   end
