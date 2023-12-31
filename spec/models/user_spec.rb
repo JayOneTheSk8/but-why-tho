@@ -76,19 +76,35 @@ RSpec.describe User do
     end
   end
 
-  it "lowers email upon save" do
-    email = "Coolio1Nice@email.com"
-    user.update!(email:)
-    expect(user.email).to eq email.downcase
+  describe "before_save" do
+    it "downcases email" do
+      email = "Coolio1Nice@email.com"
+      user.update!(email:)
+      expect(user.email).to eq email.downcase
+    end
   end
 
-  describe "#authenticate" do
-    let(:password) { "coolio" }
+  describe ".find_by_credentials" do
+    let(:password) { "G00d+im3s" }
     let!(:u) { create(:user, password:) }
 
-    it "checks the password of the user" do
-      expect(u.authenticate(password)).to be_present
-      expect(u.authenticate("badpass")).to be false
+    it "finds the user by username" do
+      expect(described_class.find_by_credentials(u.username, password)).to eq u
+    end
+
+    it "finds the user by email" do
+      expect(described_class.find_by_credentials(u.email, password)).to eq u
+    end
+
+    it "is case-insensitive" do
+      expect(described_class.find_by_credentials(u.username.upcase, password)).to eq u
+      expect(described_class.find_by_credentials(u.email.upcase, password)).to eq u
+    end
+
+    context "when the credentials are incorrect" do
+      it "returns nil" do
+        expect(described_class.find_by_credentials(u.username, "password")).to be_nil
+      end
     end
   end
 

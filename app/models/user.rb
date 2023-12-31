@@ -26,6 +26,13 @@ class User < ApplicationRecord
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :unconfirmed, -> { where(confirmed_at: nil) }
 
+  def self.find_by_credentials(passed_name, passed_word)
+    User
+      .find_by("email iLIKE :passed_name OR username iLIKE :passed_name", passed_name:)
+      .authenticate(passed_word)
+      .presence
+  end
+
   def confirm!
     update!(confirmed_at: Time.current) if unconfirmed?
   end
