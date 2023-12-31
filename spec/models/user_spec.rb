@@ -183,6 +183,11 @@ RSpec.describe User do
         .to change { u.reload.session_token }
         .and change { u.reload.updated_at }
     end
+
+    it "returns the new session_token" do
+      old_session_token = u.session_token
+      expect(u.reset_session_token!).not_to eq(old_session_token)
+    end
   end
 
   describe "#generate_confirmation_token" do
