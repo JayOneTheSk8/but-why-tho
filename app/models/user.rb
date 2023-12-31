@@ -7,6 +7,7 @@ class User < ApplicationRecord
 
   has_many :posts, dependent: :destroy
 
+  after_initialize :ensure_session_token!
   before_save :downcase_email
 
   validates(
@@ -22,6 +23,7 @@ class User < ApplicationRecord
     uniqueness: true,
     length: {maximum: 50}
   )
+  validates :session_token, presence: true, uniqueness: true
 
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :unconfirmed, -> { where(confirmed_at: nil) }
@@ -45,6 +47,12 @@ class User < ApplicationRecord
     !confirmed?
   end
 
+  def reset_session_token!
+    self.session_token = SecureRandom.urlsafe_base64(32)
+    save!
+    session_token
+  end
+
   def generate_confirmation_token
     return if confirmed?
 
@@ -60,6 +68,10 @@ class User < ApplicationRecord
   end
 
   private
+
+  def ensure_session_token!
+    self.session_token ||= SecureRandom.urlsafe_base64(32)
+  end
 
   def downcase_email
     self.email = email.downcase

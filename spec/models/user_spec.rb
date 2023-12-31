@@ -4,16 +4,17 @@ RSpec.describe User do
   let(:user) { build(:user) }
 
   describe "#valid?" do
-    %i[
+    %w[
       email
       username
+      session_token
     ].each do |attr|
-      it "is invalid with u nil #{attr}" do
+      it "is invalid with a nil #{attr}" do
         user.assign_attributes(attr => nil)
         expect(user).not_to be_valid
         expect(
           user.errors.full_messages.map(&:downcase)
-        ).to include "#{attr} can't be blank"
+        ).to include "#{attr.gsub('_', ' ')} can't be blank"
       end
     end
 
@@ -73,6 +74,13 @@ RSpec.describe User do
           expect(user).not_to be_valid
         end
       end
+    end
+  end
+
+  describe "after_initialize" do
+    it "gives the user a session_token" do
+      u = described_class.new
+      expect(u.session_token).to be_present
     end
   end
 
@@ -164,6 +172,16 @@ RSpec.describe User do
       it "returns true" do
         expect(u.unconfirmed?).to be true
       end
+    end
+  end
+
+  describe "#reset_session_token!" do
+    let!(:u) { create(:user) }
+
+    it "changes the user's session token" do
+      expect { u.reset_session_token! }
+        .to change { u.reload.session_token }
+        .and change { u.reload.updated_at }
     end
   end
 
