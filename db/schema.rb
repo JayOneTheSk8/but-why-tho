@@ -10,16 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_12_31_052627) do
+ActiveRecord::Schema[7.1].define(version: 2023_12_31_225515) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "posts", force: :cascade do |t|
     t.string "text", null: false
-    t.bigint "user_id", null: false
+    t.bigint "author_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_posts_on_user_id"
+    t.index ["author_id"], name: "index_posts_on_author_id"
     t.check_constraint "length(text::text) <= 200", name: "text_maximum_length"
   end
 
@@ -36,5 +36,5 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_31_052627) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
-  add_foreign_key "posts", "users"
+  add_foreign_key "posts", "users", column: "author_id"
 end
