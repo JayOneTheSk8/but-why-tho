@@ -10,6 +10,9 @@ AllCops:
 Layout/SpaceInsideHashLiteralBraces:
   Enabled: false
 
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
 Metrics/BlockLength:
   Enabled: false
 
