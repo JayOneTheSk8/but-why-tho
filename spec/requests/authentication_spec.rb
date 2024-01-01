@@ -86,4 +86,114 @@ RSpec.describe "Authentication" do
       end
     end
   end
+
+  describe "/sign_in" do
+    let(:password) { "S0meP@55!" }
+    let!(:user) { create(:user, password:) }
+    let(:username_params) do
+      {
+        user: {
+          login: user.username,
+          password:
+        }
+      }
+    end
+    let(:email_params) do
+      {
+        user: {
+          login: user.email,
+          password:
+        }
+      }
+    end
+
+    shared_examples "a user is logged in" do
+      it "sets a session token for the user" do
+        post("/sign_in", params:)
+        expect(session[:session_token]).to eq user.reload.session_token
+      end
+
+      it "returns the user's data" do
+        post("/sign_in", params:)
+
+        expect(session[:session_token]).to eq user.reload.session_token
+        expect(response.parsed_body).to eq(
+          {
+            "user" => {
+              "id" => user.id,
+              "username" => user.username,
+              "email" => user.email
+            }
+          }
+        )
+      end
+    end
+
+    context "with a username" do
+      let(:params) { username_params }
+
+      it_behaves_like "a user is logged in"
+
+      context "when passed username capitalisation is different" do
+        let(:params) { username_params.deep_merge(user: {login: user.username.upcase}) }
+
+        it_behaves_like "a user is logged in"
+      end
+    end
+
+    context "with an email" do
+      let(:params) { email_params }
+
+      it_behaves_like "a user is logged in"
+
+      context "when passed email capitalisation is different" do
+        let(:params) { email_params.deep_merge(user: {login: user.email.upcase}) }
+
+        it_behaves_like "a user is logged in"
+      end
+    end
+
+    context "with bad credentials" do
+      let(:params) { username_params.deep_merge(user: {password: "password"}) }
+
+      it "does not log a user in" do
+        post("/sign_in", params:)
+
+        expect(session[:session_token]).to be_nil
+        expect(response.parsed_body).to eq "errors" => ["Incorrect email/username or password"]
+        expect(response).to have_http_status :unauthorized
+      end
+    end
+  end
+
+  describe "/sign_out" do
+    let(:password) { "Ano+herP@55!" }
+    let!(:user) { create(:user, password:) }
+
+    context "with a logged in user" do
+      before { post "/sign_in", params: {user: {login: user.username, password:}} }
+
+      it "resets the user's session token" do
+        expect { get "/sign_out" }.to change { user.reload.session_token }
+      end
+
+      it "nullifies the existing session token" do
+        expect { get "/sign_out" }.to change { session[:session_token] }.to(nil)
+      end
+
+      it "returns an 'ok' status" do
+        get "/sign_out"
+        expect(response).to have_http_status :ok
+      end
+    end
+
+    context "without a logged in user" do
+      it "returns an 'not_found' status" do
+        get "/sign_out"
+
+        expect(response.parsed_body).to eq "errors" => ["No user logged in"]
+        expect(response).to have_http_status :not_found
+      end
+    end
+  end
 end
