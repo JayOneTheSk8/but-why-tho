@@ -13,6 +13,9 @@ Layout/SpaceInsideHashLiteralBraces:
 Lint/AmbiguousBlockAssociation:
   Enabled: false
 
+Metrics/MethodLength:
+  Enabled: false
+
 Metrics/BlockLength:
   Enabled: false
 
@@ -32,6 +35,12 @@ RSpec/MultipleExpectations:
   Enabled: false
 
 RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
+RSpec/NamedSubject:
+  Enabled: false
+
+RSpec/NestedGroups:
   Enabled: false
 
 RSpec/VerifiedDoubles:
