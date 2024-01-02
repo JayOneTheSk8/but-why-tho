@@ -5,7 +5,24 @@ class User < ApplicationRecord
   # Use password digest
   has_secure_password
 
-  has_many :posts, dependent: :destroy
+  has_many(
+    :posts,
+    foreign_key: :author_id,
+    dependent: :destroy
+  )
+  has_many(
+    :comments,
+    -> { where(parent_id: nil) },
+    foreign_key: :author_id,
+    dependent: :destroy
+  )
+  has_many(
+    :replies,
+    -> { where.not(parent_id: nil) },
+    class_name: :Comment,
+    foreign_key: :author_id,
+    dependent: :destroy
+  )
 
   after_initialize :ensure_session_token!
   before_save :downcase_email
