@@ -7,10 +7,42 @@ RSpec.describe "Post Requests" do
     it "shows every post by latest created at date" do
       get "/posts"
 
-      expect(response.parsed_body).to all include(:id, :text, :created_at, :author)
+      expect(response.parsed_body).to all include(:id, :text, :created_at, :author, :comment_count)
       expect(response.parsed_body.length).to eq 7
       expect(response.parsed_body)
         .to eq(response.parsed_body.sort_by { |post| Time.zone.parse(post[:created_at]) }.reverse!)
+    end
+
+    context "with comments" do
+      let(:post) { Post.order("RANDOM()").take }
+
+      before do
+        comment1 = create(:comment, post:)
+        create(:comment, post:)
+
+        create(:comment, :reply, post:, comment: comment1)
+        create(:comment, :reply, post:, comment: comment1)
+      end
+
+      it "shows the count of parent comments on the posts" do
+        get "/posts"
+
+        expect(response.parsed_body).to be_present
+        post_res = response.parsed_body.find { |res| res[:id] == post.id }
+
+        expect(post_res).to eq(
+          {
+            "id" => post.id,
+            "text" => post.text,
+            "comment_count" => 2,
+            "created_at" => post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+            "author" => {
+              "id" => post.author_id,
+              "username" => post.author.username
+            }
+          }
+        )
+      end
     end
 
     context "when there are no posts" do
@@ -34,12 +66,61 @@ RSpec.describe "Post Requests" do
             "id" => post.id,
             "text" => post.text,
             "created_at" => post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+            "comment_count" => 0,
             "author" => {
               "id" => post.author_id,
               "username" => post.author.username
-            }
+            },
+            "comments" => []
           }
         )
+    end
+
+    context "with comments" do
+      let!(:comment1) { create(:comment, post:) }
+      let!(:comment2) { create(:comment, post:) }
+
+      before do
+        create(:comment, :reply, post:, comment: comment1)
+        create(:comment, :reply, post:, comment: comment1)
+      end
+
+      it "includes the comments for the post" do
+        get "/posts/#{post.id}"
+        expect(response.parsed_body)
+          .to eq(
+            {
+              "id" => post.id,
+              "text" => post.text,
+              "comment_count" => 2,
+              "created_at" => post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+              "author" => {
+                "id" => post.author_id,
+                "username" => post.author.username
+              },
+              "comments" => [
+                {
+                  "id" => comment2.id,
+                  "text" => comment2.text,
+                  "reply_count" => 0,
+                  "author" => {
+                    "id" => comment2.author_id,
+                    "username" => comment2.author.username
+                  }
+                },
+                {
+                  "id" => comment1.id,
+                  "text" => comment1.text,
+                  "reply_count" => 2,
+                  "author" => {
+                    "id" => comment1.author_id,
+                    "username" => comment1.author.username
+                  }
+                }
+              ]
+            }
+          )
+      end
     end
 
     context "when post does not exist at given ID" do
@@ -80,11 +161,13 @@ RSpec.describe "Post Requests" do
           {
             "id" => post.id,
             "text" => post.text,
+            "comment_count" => 0,
             "created_at" => post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => post.author_id,
               "username" => post.author.username
-            }
+            },
+            "comments" => []
           }
         )
       end
@@ -137,13 +220,65 @@ RSpec.describe "Post Requests" do
           {
             "id" => user_post.id,
             "text" => post_params[:post][:text],
+            "comment_count" => 0,
             "created_at" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => user_post.author_id,
               "username" => user_post.author.username
-            }
+            },
+            "comments" => []
           }
         )
+      end
+
+      context "with comments" do
+        let!(:comment1) { create(:comment, post: user_post) }
+        let!(:comment2) { create(:comment, post: user_post) }
+
+        before do
+          create(:comment, :reply, post: user_post, comment: comment1)
+          create(:comment, :reply, post: user_post, comment: comment1)
+        end
+
+        it "includes the comments for the post" do
+          expect { put "/posts/#{user_post.id}", params: post_params }
+            .to change { user_post.reload.text }.from(post_text).to(post_params[:post][:text])
+            .and not_change { Post.count }
+
+          expect(response.parsed_body)
+            .to eq(
+              {
+                "id" => user_post.id,
+                "text" => post_params[:post][:text],
+                "comment_count" => 2,
+                "created_at" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "author" => {
+                  "id" => user_post.author_id,
+                  "username" => user_post.author.username
+                },
+                "comments" => [
+                  {
+                    "id" => comment2.id,
+                    "text" => comment2.text,
+                    "reply_count" => 0,
+                    "author" => {
+                      "id" => comment2.author_id,
+                      "username" => comment2.author.username
+                    }
+                  },
+                  {
+                    "id" => comment1.id,
+                    "text" => comment1.text,
+                    "reply_count" => 2,
+                    "author" => {
+                      "id" => comment1.author_id,
+                      "username" => comment1.author.username
+                    }
+                  }
+                ]
+              }
+            )
+        end
       end
 
       context "when post does not exist at given ID" do
@@ -218,13 +353,45 @@ RSpec.describe "Post Requests" do
           {
             "id" => user_post.id,
             "text" => user_post.text,
+            "comment_count" => 0,
             "created_at" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => user_post.author_id,
               "username" => user_post.author.username
-            }
+            },
+            "comments" => []
           }
         )
+      end
+
+      context "with comments" do
+        before do
+          comment1 = create(:comment, post: user_post)
+          create(:comment, post: user_post)
+          create(:comment, :reply, post: user_post, comment: comment1)
+          create(:comment, :reply, post: user_post, comment: comment1)
+        end
+
+        it "does not include the comments for the post" do
+          expect { delete "/posts/#{user_post.id}" }
+            .to change { Post.count }.by(-1)
+            .and change { Post.find_by(id: user_post.id).present? }.from(true).to(false)
+
+          expect(response.parsed_body)
+            .to eq(
+              {
+                "id" => user_post.id,
+                "text" => user_post.text,
+                "comment_count" => 0,
+                "created_at" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "author" => {
+                  "id" => user_post.author_id,
+                  "username" => user_post.author.username
+                },
+                "comments" => []
+              }
+            )
+        end
       end
 
       context "when post does not exist at given ID" do
@@ -307,6 +474,7 @@ RSpec.describe "Post Requests" do
           {
             "id" => post3.id,
             "text" => post3.text,
+            "comment_count" => 0,
             "created_at" => post3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => user.id,
@@ -316,6 +484,7 @@ RSpec.describe "Post Requests" do
           {
             "id" => post2.id,
             "text" => post2.text,
+            "comment_count" => 0,
             "created_at" => post2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => user.id,
@@ -325,6 +494,7 @@ RSpec.describe "Post Requests" do
           {
             "id" => post1.id,
             "text" => post1.text,
+            "comment_count" => 0,
             "created_at" => post1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => user.id,
@@ -333,6 +503,36 @@ RSpec.describe "Post Requests" do
           }
         ]
       )
+    end
+
+    context "with comments" do
+      before do
+        comment1 = create(:comment, post: post2)
+        create(:comment, post: post2)
+
+        create(:comment, :reply, post: post2, comment: comment1)
+        create(:comment, :reply, post: post2, comment: comment1)
+      end
+
+      it "shows the count of parent comments on the posts" do
+        get "/posts"
+
+        expect(response.parsed_body).to be_present
+        post_res = response.parsed_body.find { |res| res[:id] == post2.id }
+
+        expect(post_res).to eq(
+          {
+            "id" => post2.id,
+            "text" => post2.text,
+            "comment_count" => 2,
+            "created_at" => post2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+            "author" => {
+              "id" => post2.author_id,
+              "username" => post2.author.username
+            }
+          }
+        )
+      end
     end
 
     context "when User does not exist at given ID" do
