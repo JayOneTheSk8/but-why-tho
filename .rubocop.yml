@@ -13,6 +13,12 @@ Layout/SpaceInsideHashLiteralBraces:
 Lint/AmbiguousBlockAssociation:
   Enabled: false
 
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
 Metrics/MethodLength:
   Enabled: false
 
@@ -22,7 +28,16 @@ Metrics/BlockLength:
 Rails/I18nLocaleTexts:
   Enabled: false
 
+Rails/InverseOf:
+  Enabled: false
+
+RSpec/AnyInstance:
+  Enabled: false
+
 RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/ExpectChange:
   Enabled: false
 
 RSpec/IndexedLet:
