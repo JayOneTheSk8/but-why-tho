@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "Authentication" do
-  describe "/sign_up" do
+  describe "POST /sign_up" do
     let(:user_params) do
       {
         user: {
@@ -87,7 +87,7 @@ RSpec.describe "Authentication" do
     end
   end
 
-  describe "/sign_in" do
+  describe "POST /sign_in" do
     let(:password) { "S0meP@55!" }
     let!(:user) { create(:user, password:) }
     let(:username_params) do
@@ -166,7 +166,7 @@ RSpec.describe "Authentication" do
     end
   end
 
-  describe "/sign_out" do
+  describe "GET /sign_out" do
     let(:password) { "Ano+herP@55!" }
     let!(:user) { create(:user, password:) }
 
