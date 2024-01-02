@@ -7,6 +7,9 @@ AllCops:
   TargetRubyVersion: 3.2.2
   NewCops: enable
 
+FactoryBot/FactoryAssociationWithStrategy:
+  Enabled: false
+
 Layout/SpaceInsideHashLiteralBraces:
   Enabled: false
 
