@@ -2,13 +2,20 @@ class PostsController < ApplicationController
   before_action :require_login, only: [:create, :update, :destroy]
 
   def index
-    @posts = Post.includes(:author).order(created_at: :desc)
+    @posts = Post
+             .includes(:author, :comments)
+             .where(comments: {parent_id: nil})
+             .order(created_at: :desc)
+
     render :index
   end
 
   def show
     id = params[:id]
-    @post = Post.includes(:author).find_by(id:)
+    @post = Post
+            .includes(:author, comments: [:author, :replies])
+            .where(comments: {parent_id: nil})
+            .find_by(id:)
 
     if @post.present?
       render :show
@@ -36,7 +43,10 @@ class PostsController < ApplicationController
 
   def update
     id = params[:id]
-    @post = Post.includes(:author).find_by(id:)
+    @post = Post
+            .includes(:author, comments: [:author, :replies])
+            .where(comments: {parent_id: nil})
+            .find_by(id:)
 
     if @post.present?
       if @post.author_id == current_user.id
@@ -64,7 +74,10 @@ class PostsController < ApplicationController
 
   def destroy
     id = params[:id]
-    @post = Post.find_by(id:)
+    @post = Post
+            .includes(:author, comments: [:author, :replies])
+            .where(comments: {parent_id: nil})
+            .find_by(id:)
 
     if @post.present?
       if @post.author_id == current_user.id
@@ -92,8 +105,8 @@ class PostsController < ApplicationController
 
   def user_posts
     @posts = Post
-             .includes(:author)
-             .where(author_id: params[:user_id])
+             .includes(:author, :comments)
+             .where(comments: {parent_id: nil}, author_id: params[:user_id])
              .order(created_at: :desc)
 
     render :index
