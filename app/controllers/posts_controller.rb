@@ -4,7 +4,6 @@ class PostsController < ApplicationController
   def index
     @posts = Post
              .includes(:author, :comments)
-             .where(comments: {parent_id: nil})
              .order(created_at: :desc)
 
     render :index
@@ -14,7 +13,6 @@ class PostsController < ApplicationController
     id = params[:id]
     @post = Post
             .includes(:author, comments: [:author, :replies])
-            .where(comments: {parent_id: nil})
             .find_by(id:)
 
     if @post.present?
@@ -45,7 +43,6 @@ class PostsController < ApplicationController
     id = params[:id]
     @post = Post
             .includes(:author, comments: [:author, :replies])
-            .where(comments: {parent_id: nil})
             .find_by(id:)
 
     if @post.present?
@@ -76,7 +73,6 @@ class PostsController < ApplicationController
     id = params[:id]
     @post = Post
             .includes(:author, comments: [:author, :replies])
-            .where(comments: {parent_id: nil})
             .find_by(id:)
 
     if @post.present?
@@ -106,7 +102,7 @@ class PostsController < ApplicationController
   def user_posts
     @posts = Post
              .includes(:author, :comments)
-             .where(comments: {parent_id: nil}, author_id: params[:user_id])
+             .where(author_id: params[:user_id])
              .order(created_at: :desc)
 
     render :index
