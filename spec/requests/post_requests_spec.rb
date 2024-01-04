@@ -102,6 +102,7 @@ RSpec.describe "Post Requests" do
                 {
                   "id" => comment2.id,
                   "text" => comment2.text,
+                  "created_at" => comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                   "reply_count" => 0,
                   "author" => {
                     "id" => comment2.author_id,
@@ -111,6 +112,7 @@ RSpec.describe "Post Requests" do
                 {
                   "id" => comment1.id,
                   "text" => comment1.text,
+                  "created_at" => comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                   "reply_count" => 2,
                   "author" => {
                     "id" => comment1.author_id,
@@ -260,6 +262,7 @@ RSpec.describe "Post Requests" do
                   {
                     "id" => comment2.id,
                     "text" => comment2.text,
+                    "created_at" => comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                     "reply_count" => 0,
                     "author" => {
                       "id" => comment2.author_id,
@@ -269,6 +272,7 @@ RSpec.describe "Post Requests" do
                   {
                     "id" => comment1.id,
                     "text" => comment1.text,
+                    "created_at" => comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                     "reply_count" => 2,
                     "author" => {
                       "id" => comment1.author_id,
