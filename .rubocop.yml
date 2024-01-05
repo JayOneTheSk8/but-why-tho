@@ -37,6 +37,9 @@ Rails/InverseOf:
 RSpec/AnyInstance:
   Enabled: false
 
+Rails/BulkChangeTable:
+  Enabled: false
+
 RSpec/ExampleLength:
   Enabled: false
 
