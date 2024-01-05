@@ -10,8 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_01_053548) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_04_212258) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "citext"
   enable_extension "plpgsql"
 
   create_table "comments", force: :cascade do |t|
@@ -36,8 +37,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_01_053548) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "username", null: false
-    t.string "email", null: false
+    t.citext "username", null: false
+    t.citext "email", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "confirmed_at"
