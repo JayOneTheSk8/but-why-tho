@@ -8,6 +8,7 @@ RSpec.describe User do
       email
       username
       session_token
+      display_name
     ].each do |attr|
       it "is invalid with a nil #{attr}" do
         user.assign_attributes(attr => nil)
@@ -73,6 +74,16 @@ RSpec.describe User do
           user.assign_attributes(username: "-s0me_0ne.#{chr}")
           expect(user).not_to be_valid
         end
+      end
+    end
+
+    describe "display_name attribute" do
+      it "does not allow display_name longer than 50 characters" do
+        user.assign_attributes(display_name: "x" * 51)
+        expect(user).not_to be_valid
+        expect(
+          user.errors.full_messages
+        ).to include "Display name is too long (maximum is 50 characters)"
       end
     end
   end

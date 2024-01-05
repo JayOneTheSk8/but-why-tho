@@ -40,6 +40,8 @@ class User < ApplicationRecord
     uniqueness: true,
     length: {maximum: 50}
   )
+
+  validates :display_name, presence: true, length: {maximum: 50}
   validates :session_token, presence: true, uniqueness: true
 
   scope :confirmed, -> { where.not(confirmed_at: nil) }
