@@ -3,23 +3,27 @@
 
 User.create!(
   username: "coolGuy17",
+  display_name: "Cool Guy 17",
   email: "livinincalabasas@dbz.com",
   password: "winnerch1ckend1nneR",
   confirmed_at: Time.current
 )
 User.create!(
   username: "dolly_parkins",
+  display_name: "Dolly Parkins",
   email: "dolpar@gm.com",
   password: "Mov1n0nup",
   confirmed_at: Time.current
 )
 User.create!(
   username: "monsieurMongo",
+  display_name: "Monsieur Mongo",
   email: "mon@mongo.com",
   password: "un+i3d"
 )
 User.create!(
   username: "grennaGreenz143",
+  display_name: "Grenna Greenz 143",
   email: "greenzzzz@more.com",
   password: "ju5t@pasS"
 )
