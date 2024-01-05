@@ -6,6 +6,7 @@ RSpec.describe "Authentication" do
       {
         user: {
           username: "Daniel123",
+          display_name: "Daniel 123",
           email: "danny123@email.com",
           password: "RealLifePass123!",
           password_confirmation: "RealLifePass123!"
@@ -31,7 +32,8 @@ RSpec.describe "Authentication" do
             "user" => {
               "id" => u.id,
               "username" => u.username,
-              "email" => u.email
+              "email" => u.email,
+              "display_name" => u.display_name
             }
           }
         )
@@ -122,7 +124,8 @@ RSpec.describe "Authentication" do
             "user" => {
               "id" => user.id,
               "username" => user.username,
-              "email" => user.email
+              "email" => user.email,
+              "display_name" => user.display_name
             }
           }
         )
