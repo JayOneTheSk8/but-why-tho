@@ -6,4 +6,5 @@ json.reply_count comment.replies.count
 json.author do
   json.id comment.author_id
   json.username comment.author.username
+  json.display_name comment.author.display_name
 end

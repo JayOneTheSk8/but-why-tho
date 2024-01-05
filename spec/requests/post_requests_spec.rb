@@ -38,7 +38,8 @@ RSpec.describe "Post Requests" do
             "created_at" => post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => post.author_id,
-              "username" => post.author.username
+              "username" => post.author.username,
+              "display_name" => post.author.display_name
             }
           }
         )
@@ -69,7 +70,8 @@ RSpec.describe "Post Requests" do
             "comment_count" => 0,
             "author" => {
               "id" => post.author_id,
-              "username" => post.author.username
+              "username" => post.author.username,
+              "display_name" => post.author.display_name
             },
             "comments" => []
           }
@@ -96,7 +98,8 @@ RSpec.describe "Post Requests" do
               "created_at" => post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
               "author" => {
                 "id" => post.author_id,
-                "username" => post.author.username
+                "username" => post.author.username,
+                "display_name" => post.author.display_name
               },
               "comments" => [
                 {
@@ -106,7 +109,8 @@ RSpec.describe "Post Requests" do
                   "reply_count" => 0,
                   "author" => {
                     "id" => comment2.author_id,
-                    "username" => comment2.author.username
+                    "username" => comment2.author.username,
+                    "display_name" => comment2.author.display_name
                   }
                 },
                 {
@@ -116,7 +120,8 @@ RSpec.describe "Post Requests" do
                   "reply_count" => 2,
                   "author" => {
                     "id" => comment1.author_id,
-                    "username" => comment1.author.username
+                    "username" => comment1.author.username,
+                    "display_name" => comment1.author.display_name
                   }
                 }
               ]
@@ -167,7 +172,8 @@ RSpec.describe "Post Requests" do
             "created_at" => post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => post.author_id,
-              "username" => post.author.username
+              "username" => post.author.username,
+              "display_name" => post.author.display_name
             },
             "comments" => []
           }
@@ -226,7 +232,8 @@ RSpec.describe "Post Requests" do
             "created_at" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => user_post.author_id,
-              "username" => user_post.author.username
+              "username" => user_post.author.username,
+              "display_name" => user_post.author.display_name
             },
             "comments" => []
           }
@@ -256,7 +263,8 @@ RSpec.describe "Post Requests" do
                 "created_at" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "author" => {
                   "id" => user_post.author_id,
-                  "username" => user_post.author.username
+                  "username" => user_post.author.username,
+                  "display_name" => user_post.author.display_name
                 },
                 "comments" => [
                   {
@@ -266,7 +274,8 @@ RSpec.describe "Post Requests" do
                     "reply_count" => 0,
                     "author" => {
                       "id" => comment2.author_id,
-                      "username" => comment2.author.username
+                      "username" => comment2.author.username,
+                      "display_name" => comment2.author.display_name
                     }
                   },
                   {
@@ -276,7 +285,8 @@ RSpec.describe "Post Requests" do
                     "reply_count" => 2,
                     "author" => {
                       "id" => comment1.author_id,
-                      "username" => comment1.author.username
+                      "username" => comment1.author.username,
+                      "display_name" => comment1.author.display_name
                     }
                   }
                 ]
@@ -361,7 +371,8 @@ RSpec.describe "Post Requests" do
             "created_at" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => user_post.author_id,
-              "username" => user_post.author.username
+              "username" => user_post.author.username,
+              "display_name" => user_post.author.display_name
             },
             "comments" => []
           }
@@ -390,7 +401,8 @@ RSpec.describe "Post Requests" do
                 "created_at" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "author" => {
                   "id" => user_post.author_id,
-                  "username" => user_post.author.username
+                  "username" => user_post.author.username,
+                  "display_name" => user_post.author.display_name
                 },
                 "comments" => []
               }
@@ -482,7 +494,8 @@ RSpec.describe "Post Requests" do
             "created_at" => post3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => user.id,
-              "username" => user.username
+              "username" => user.username,
+              "display_name" => user.display_name
             }
           },
           {
@@ -492,7 +505,8 @@ RSpec.describe "Post Requests" do
             "created_at" => post2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => user.id,
-              "username" => user.username
+              "username" => user.username,
+              "display_name" => user.display_name
             }
           },
           {
@@ -502,7 +516,8 @@ RSpec.describe "Post Requests" do
             "created_at" => post1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => user.id,
-              "username" => user.username
+              "username" => user.username,
+              "display_name" => user.display_name
             }
           }
         ]
@@ -532,7 +547,8 @@ RSpec.describe "Post Requests" do
             "created_at" => post2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => post2.author_id,
-              "username" => post2.author.username
+              "username" => post2.author.username,
+              "display_name" => post2.author.display_name
             }
           }
         )

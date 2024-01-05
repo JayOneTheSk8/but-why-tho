@@ -15,7 +15,8 @@ RSpec.describe "Comment Requests" do
             "reply_count" => 0,
             "author" => {
               "id" => comment.author_id,
-              "username" => comment.author.username
+              "username" => comment.author.username,
+              "display_name" => comment.author.display_name
             },
             "post" => {
               "id" => comment.post_id,
@@ -24,7 +25,8 @@ RSpec.describe "Comment Requests" do
               "comment_count" => comment.post.comments.count,
               "author" => {
                 "id" => comment.post.author_id,
-                "username" => comment.post.author.username
+                "username" => comment.post.author.username,
+                "display_name" => comment.post.author.display_name
               }
             },
             "parent" => nil,
@@ -53,7 +55,8 @@ RSpec.describe "Comment Requests" do
               "reply_count" => 2,
               "author" => {
                 "id" => comment.author_id,
-                "username" => comment.author.username
+                "username" => comment.author.username,
+                "display_name" => comment.author.display_name
               },
               "post" => {
                 "id" => comment.post_id,
@@ -62,7 +65,8 @@ RSpec.describe "Comment Requests" do
                 "comment_count" => comment.post.comments.count,
                 "author" => {
                   "id" => comment.post.author_id,
-                  "username" => comment.post.author.username
+                  "username" => comment.post.author.username,
+                  "display_name" => comment.post.author.display_name
                 }
               },
               "parent" => nil,
@@ -74,7 +78,8 @@ RSpec.describe "Comment Requests" do
                   "reply_count" => 2,
                   "author" => {
                     "id" => reply2.author_id,
-                    "username" => reply2.author.username
+                    "username" => reply2.author.username,
+                    "display_name" => reply2.author.display_name
                   }
                 },
                 {
@@ -84,7 +89,8 @@ RSpec.describe "Comment Requests" do
                   "reply_count" => 0,
                   "author" => {
                     "id" => reply1.author_id,
-                    "username" => reply1.author.username
+                    "username" => reply1.author.username,
+                    "display_name" => reply1.author.display_name
                   }
                 }
               ]
@@ -112,7 +118,8 @@ RSpec.describe "Comment Requests" do
               "reply_count" => 0,
               "author" => {
                 "id" => comment.author_id,
-                "username" => comment.author.username
+                "username" => comment.author.username,
+                "display_name" => comment.author.display_name
               },
               "post" => {
                 "id" => comment.post_id,
@@ -121,7 +128,8 @@ RSpec.describe "Comment Requests" do
                 "comment_count" => comment.post.comments.count,
                 "author" => {
                   "id" => comment.post.author_id,
-                  "username" => comment.post.author.username
+                  "username" => comment.post.author.username,
+                  "display_name" => comment.post.author.display_name
                 }
               },
               "parent" => {
@@ -131,7 +139,8 @@ RSpec.describe "Comment Requests" do
                 "reply_count" => 2,
                 "author" => {
                   "id" => parent_comment.author_id,
-                  "username" => parent_comment.author.username
+                  "username" => parent_comment.author.username,
+                  "display_name" => parent_comment.author.display_name
                 }
               },
               "replies" => []
@@ -186,7 +195,8 @@ RSpec.describe "Comment Requests" do
             "reply_count" => 0,
             "author" => {
               "id" => user.id,
-              "username" => user.username
+              "username" => user.username,
+              "display_name" => user.display_name
             },
             "post" => {
               "id" => comment.post_id,
@@ -195,7 +205,8 @@ RSpec.describe "Comment Requests" do
               "comment_count" => comment.post.comments.count,
               "author" => {
                 "id" => comment.post.author_id,
-                "username" => comment.post.author.username
+                "username" => comment.post.author.username,
+                "display_name" => comment.post.author.display_name
               }
             },
             "parent" => nil,
@@ -256,7 +267,8 @@ RSpec.describe "Comment Requests" do
             "reply_count" => 0,
             "author" => {
               "id" => user.id,
-              "username" => user.username
+              "username" => user.username,
+              "display_name" => user.display_name
             },
             "post" => {
               "id" => comment.post_id,
@@ -265,7 +277,8 @@ RSpec.describe "Comment Requests" do
               "comment_count" => comment.post.comments.count,
               "author" => {
                 "id" => comment.post.author_id,
-                "username" => comment.post.author.username
+                "username" => comment.post.author.username,
+                "display_name" => comment.post.author.display_name
               }
             },
             "parent" => nil,
@@ -300,7 +313,8 @@ RSpec.describe "Comment Requests" do
                 "reply_count" => 2,
                 "author" => {
                   "id" => user.id,
-                  "username" => user.username
+                  "username" => user.username,
+                  "display_name" => user.display_name
                 },
                 "post" => {
                   "id" => comment.post_id,
@@ -309,7 +323,8 @@ RSpec.describe "Comment Requests" do
                   "comment_count" => comment.post.comments.count,
                   "author" => {
                     "id" => comment.post.author_id,
-                    "username" => comment.post.author.username
+                    "username" => comment.post.author.username,
+                    "display_name" => comment.post.author.display_name
                   }
                 },
                 "parent" => {
@@ -319,7 +334,8 @@ RSpec.describe "Comment Requests" do
                   "reply_count" => 2,
                   "author" => {
                     "id" => parent_comment.author_id,
-                    "username" => parent_comment.author.username
+                    "username" => parent_comment.author.username,
+                    "display_name" => parent_comment.author.display_name
                   }
                 },
                 "replies" => [
@@ -330,7 +346,8 @@ RSpec.describe "Comment Requests" do
                     "reply_count" => 2,
                     "author" => {
                       "id" => reply2.author_id,
-                      "username" => reply2.author.username
+                      "username" => reply2.author.username,
+                      "display_name" => reply2.author.display_name
                     }
                   },
                   {
@@ -340,7 +357,8 @@ RSpec.describe "Comment Requests" do
                     "reply_count" => 0,
                     "author" => {
                       "id" => reply1.author_id,
-                      "username" => reply1.author.username
+                      "username" => reply1.author.username,
+                      "display_name" => reply1.author.display_name
                     }
                   }
                 ]
@@ -426,7 +444,8 @@ RSpec.describe "Comment Requests" do
             "reply_count" => 0,
             "author" => {
               "id" => user.id,
-              "username" => user.username
+              "username" => user.username,
+              "display_name" => user.display_name
             },
             "post" => {
               "id" => comment.post_id,
@@ -435,7 +454,8 @@ RSpec.describe "Comment Requests" do
               "comment_count" => 0,
               "author" => {
                 "id" => comment.post.author_id,
-                "username" => comment.post.author.username
+                "username" => comment.post.author.username,
+                "display_name" => comment.post.author.display_name
               }
             },
             "parent" => nil,
@@ -476,7 +496,8 @@ RSpec.describe "Comment Requests" do
                 "reply_count" => 0,
                 "author" => {
                   "id" => user.id,
-                  "username" => user.username
+                  "username" => user.username,
+                  "display_name" => user.display_name
                 },
                 "post" => {
                   "id" => comment.post_id,
@@ -485,7 +506,8 @@ RSpec.describe "Comment Requests" do
                   "comment_count" => 1,
                   "author" => {
                     "id" => comment.post.author_id,
-                    "username" => comment.post.author.username
+                    "username" => comment.post.author.username,
+                    "display_name" => comment.post.author.display_name
                   }
                 },
                 "parent" => {
@@ -495,7 +517,8 @@ RSpec.describe "Comment Requests" do
                   "reply_count" => 1,
                   "author" => {
                     "id" => parent_comment.author_id,
-                    "username" => parent_comment.author.username
+                    "username" => parent_comment.author.username,
+                    "display_name" => parent_comment.author.display_name
                   }
                 },
                 "replies" => []
@@ -595,7 +618,8 @@ RSpec.describe "Comment Requests" do
             "reply_count" => 0,
             "author" => {
               "id" => self_reply.author_id,
-              "username" => self_reply.author.username
+              "username" => self_reply.author.username,
+              "display_name" => self_reply.author.display_name
             },
             "post" => {
               "id" => self_reply.post_id,
@@ -604,7 +628,8 @@ RSpec.describe "Comment Requests" do
               "comment_count" => 1,
               "author" => {
                 "id" => self_reply.post.author_id,
-                "username" => self_reply.post.author.username
+                "username" => self_reply.post.author.username,
+                "display_name" => self_reply.post.author.display_name
               }
             },
             "parent" => {
@@ -614,7 +639,8 @@ RSpec.describe "Comment Requests" do
               "reply_count" => 1,
               "author" => {
                 "id" => comment2.author_id,
-                "username" => comment2.author.username
+                "username" => comment2.author.username,
+                "display_name" => comment2.author.display_name
               }
             }
           },
@@ -625,7 +651,8 @@ RSpec.describe "Comment Requests" do
             "reply_count" => 0,
             "author" => {
               "id" => comment3.author_id,
-              "username" => comment3.author.username
+              "username" => comment3.author.username,
+              "display_name" => comment3.author.display_name
             },
             "post" => {
               "id" => comment3.post_id,
@@ -634,7 +661,8 @@ RSpec.describe "Comment Requests" do
               "comment_count" => 1,
               "author" => {
                 "id" => comment3.post.author_id,
-                "username" => comment3.post.author.username
+                "username" => comment3.post.author.username,
+                "display_name" => comment3.post.author.display_name
               }
             },
             "parent" => nil
@@ -646,7 +674,8 @@ RSpec.describe "Comment Requests" do
             "reply_count" => 1,
             "author" => {
               "id" => comment2.author_id,
-              "username" => comment2.author.username
+              "username" => comment2.author.username,
+              "display_name" => comment2.author.display_name
             },
             "post" => {
               "id" => comment2.post_id,
@@ -655,7 +684,8 @@ RSpec.describe "Comment Requests" do
               "comment_count" => 1,
               "author" => {
                 "id" => comment2.post.author_id,
-                "username" => comment2.post.author.username
+                "username" => comment2.post.author.username,
+                "display_name" => comment2.post.author.display_name
               }
             },
             "parent" => nil
@@ -667,7 +697,8 @@ RSpec.describe "Comment Requests" do
             "reply_count" => 0,
             "author" => {
               "id" => comment1.author_id,
-              "username" => comment1.author.username
+              "username" => comment1.author.username,
+              "display_name" => comment1.author.display_name
             },
             "post" => {
               "id" => comment1.post_id,
@@ -676,7 +707,8 @@ RSpec.describe "Comment Requests" do
               "comment_count" => 1,
               "author" => {
                 "id" => comment1.post.author_id,
-                "username" => comment1.post.author.username
+                "username" => comment1.post.author.username,
+                "display_name" => comment1.post.author.display_name
               }
             },
             "parent" => nil
