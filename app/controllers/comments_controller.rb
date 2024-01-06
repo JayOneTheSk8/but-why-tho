@@ -125,7 +125,7 @@ class CommentsController < ApplicationController
                 .where(author_id: params[:user_id])
                 .order(created_at: :desc)
 
-    render "comments/user_comments"
+    render :user_comments
   end
 
   private
