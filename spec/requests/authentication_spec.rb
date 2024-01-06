@@ -29,12 +29,10 @@ RSpec.describe "Authentication" do
 
         expect(response.parsed_body).to eq(
           {
-            "user" => {
-              "id" => u.id,
-              "username" => u.username,
-              "email" => u.email,
-              "display_name" => u.display_name
-            }
+            "id" => u.id,
+            "username" => u.username,
+            "email" => u.email,
+            "display_name" => u.display_name
           }
         )
       end
@@ -121,12 +119,10 @@ RSpec.describe "Authentication" do
         expect(session[:session_token]).to eq user.reload.session_token
         expect(response.parsed_body).to eq(
           {
-            "user" => {
-              "id" => user.id,
-              "username" => user.username,
-              "email" => user.email,
-              "display_name" => user.display_name
-            }
+            "id" => user.id,
+            "username" => user.username,
+            "email" => user.email,
+            "display_name" => user.display_name
           }
         )
       end
