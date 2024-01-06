@@ -47,10 +47,11 @@ class User < ApplicationRecord
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :unconfirmed, -> { where(confirmed_at: nil) }
 
-  def self.find_by_credentials(passed_name, passed_word)
+  def self.find_by_credentials(login, password)
     User
-      .find_by("email iLIKE :passed_name OR username iLIKE :passed_name", passed_name:)
-      .authenticate(passed_word)
+      .where(username: login).or(User.where(email: login))
+      .first
+      .authenticate(password)
       .presence
   end
 
