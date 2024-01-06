@@ -10,6 +10,11 @@ Rails.application.routes.draw do
   resources :posts, format: "json"
   resources :comments, only: [:show, :create, :update, :destroy], format: "json"
 
+  post "follows", to: "follows#create", format: "json"
+  delete "follows", to: "follows#destroy", format: "json"
+
   get "users/:user_id/posts", to: "posts#user_posts", format: "json"
   get "users/:user_id/comments", to: "comments#user_comments", format: "json"
+  get "users/:user_id/subscriptions", to: "follows#followed_users", format: "json"
+  get "users/:user_id/followers", to: "follows#followers", format: "json"
 end
