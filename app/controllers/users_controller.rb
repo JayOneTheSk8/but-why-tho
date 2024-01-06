@@ -1,4 +1,19 @@
 class UsersController < ApplicationController
+  def show
+    @user = User
+            .includes(:subscriptions, :follows)
+            .find_by(username: params[:username])
+
+    if @user.present?
+      render :show
+    else
+      render(
+        json: {errors: ["This account doesn't exist"]},
+        status: :not_found
+      )
+    end
+  end
+
   def create
     @user = User.new(user_params)
     if @user.save
