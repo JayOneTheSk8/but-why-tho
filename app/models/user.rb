@@ -24,6 +24,30 @@ class User < ApplicationRecord
     dependent: :destroy
   )
 
+  has_many(
+    :subscriptions,
+    foreign_key: :follower_id,
+    class_name: :Follow,
+    dependent: :destroy
+  )
+  has_many(
+    :followed_users,
+    -> { order("follows.created_at DESC") },
+    through: :subscriptions,
+    source: :followee
+  )
+  has_many(
+    :follows,
+    foreign_key: :followee_id,
+    dependent: :destroy
+  )
+  has_many(
+    :followers,
+    -> { order("follows.created_at DESC") },
+    through: :follows,
+    source: :follower
+  )
+
   after_initialize :ensure_session_token!
   before_save :downcase_email
 
