@@ -36,6 +36,16 @@ RSpec.describe "Authentication" do
           }
         )
       end
+
+      it "logs the user in" do
+        post("/sign_up", params:)
+
+        username = params[:user][:username]
+        email = params[:user][:email]
+
+        u = User.find_by!(username:, email:)
+        expect(session[:session_token]).to eq u.session_token
+      end
     end
 
     context "with all fields" do

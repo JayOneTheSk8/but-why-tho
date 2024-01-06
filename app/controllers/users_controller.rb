@@ -3,7 +3,8 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     if @user.save
       @user.send_confirmation_email!
-      render :show
+      login! @user
+      render "sessions/show"
     else
       render(
         json: {errors: @user.errors.full_messages},
