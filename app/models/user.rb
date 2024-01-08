@@ -145,6 +145,8 @@ class User < ApplicationRecord
           post_authors.id as author_id,
           post_authors.username as author_username,
           post_authors.display_name as author_display_name,
+          user_likes.like_id as like_id,
+          user_likes.liked_at as liked_at,
           user_likes.like_type as like_type
         FROM posts
         INNER JOIN users post_authors
@@ -155,6 +157,8 @@ class User < ApplicationRecord
         GROUP BY
           posts.id,
           post_authors.id,
+          user_likes.like_id,
+          user_likes.liked_at,
           user_likes.like_type
       ), liked_comments as (
         SELECT
@@ -164,6 +168,8 @@ class User < ApplicationRecord
           comment_authors.id as author_id,
           comment_authors.username as author_username,
           comment_authors.display_name as author_display_name,
+          user_likes.like_id as like_id,
+          user_likes.liked_at as liked_at,
           user_likes.like_type as like_type
         FROM comments
         INNER JOIN users comment_authors
@@ -174,6 +180,8 @@ class User < ApplicationRecord
         GROUP BY
           comments.id,
           comment_authors.id,
+          user_likes.like_id,
+          user_likes.liked_at,
           user_likes.like_type
       ), merged as (
         SELECT * FROM liked_posts
@@ -193,16 +201,12 @@ class User < ApplicationRecord
       )
       SELECT
         merged.*,
-        user_likes.liked_at as liked_at,
         like_counts.like_count as like_count
       FROM merged
-      INNER JOIN user_likes
-        ON user_likes.like_type = merged.like_type
-        AND user_likes.message_id = merged.id
       INNER JOIN like_counts
         ON like_counts.message_type = merged.like_type
         AND like_counts.message_id = merged.id
-      ORDER BY user_likes.like_id DESC
+      ORDER BY merged.like_id DESC
     SQL
   end
 

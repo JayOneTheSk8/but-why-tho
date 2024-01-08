@@ -294,6 +294,7 @@ RSpec.describe "Like Requests" do
                 "author_username" => comment2.author.username,
                 "author_display_name" => comment2.author.display_name,
                 "like_type" => "CommentLike",
+                "like_id" => like5.id,
                 "liked_at" => like5.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "like_count" => comment2_like_count + 1
               },
@@ -305,6 +306,7 @@ RSpec.describe "Like Requests" do
                 "author_username" => post1.author.username,
                 "author_display_name" => post1.author.display_name,
                 "like_type" => "PostLike",
+                "like_id" => like4.id,
                 "liked_at" => like4.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "like_count" => post1_like_count + 1
               },
@@ -316,6 +318,7 @@ RSpec.describe "Like Requests" do
                 "author_username" => comment1.author.username,
                 "author_display_name" => comment1.author.display_name,
                 "like_type" => "CommentLike",
+                "like_id" => like3.id,
                 "liked_at" => like3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "like_count" => comment1_like_count + 1
               },
@@ -327,6 +330,7 @@ RSpec.describe "Like Requests" do
                 "author_username" => reply1.author.username,
                 "author_display_name" => reply1.author.display_name,
                 "like_type" => "CommentLike",
+                "like_id" => like2.id,
                 "liked_at" => like2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "like_count" => reply1_like_count + 1
               },
@@ -338,6 +342,7 @@ RSpec.describe "Like Requests" do
                 "author_username" => post2.author.username,
                 "author_display_name" => post2.author.display_name,
                 "like_type" => "PostLike",
+                "like_id" => like1.id,
                 "liked_at" => like1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "like_count" => post2_like_count + 1
               }
