@@ -107,6 +107,9 @@ RSpec.describe "Follow Requests" do
           expect { delete "/follows", params: {follow: {followee_id: 0}} }
             .to not_change { Follow.count }
             .and not_change { Follow.find_by(follower_id: user.id, followee_id: other_user.id).present? }.from(true)
+
+          expect(response.parsed_body).to eq "errors" => ["Unable to find follow reference."]
+          expect(response).to have_http_status :not_found
         end
       end
 
