@@ -19,6 +19,12 @@ Rails.application.routes.draw do
   post "post_likes", to: "likes#create_post_like", format: "json"
   delete "post_likes", to: "likes#destroy_post_like", format: "json"
 
+  post "comment_reposts", to: "reposts#create_comment_repost", format: "json"
+  delete "comment_reposts", to: "reposts#destroy_comment_repost", format: "json"
+
+  post "post_reposts", to: "reposts#create_post_repost", format: "json"
+  delete "post_reposts", to: "reposts#destroy_post_repost", format: "json"
+
   get "users/:user_id/posts", to: "posts#user_posts", format: "json"
   get "users/:user_id/comments", to: "comments#user_comments", format: "json"
   get "users/:user_id/subscriptions", to: "follows#followed_users", format: "json"
