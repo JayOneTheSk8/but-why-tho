@@ -145,18 +145,17 @@ class User < ApplicationRecord
           post_authors.id as author_id,
           post_authors.username as author_username,
           post_authors.display_name as author_display_name,
-          'PostLike' as like_type
+          user_likes.like_type as like_type
         FROM posts
         INNER JOIN users post_authors
           ON posts.author_id = post_authors.id
-        WHERE posts.id IN (
-          SELECT user_likes.message_id as id
-          FROM user_likes
-          WHERE user_likes.like_type = 'PostLike'
-        )
+        INNER JOIN user_likes
+          ON user_likes.message_id = posts.id
+          AND user_likes.like_type = 'PostLike'
         GROUP BY
           posts.id,
-          post_authors.id
+          post_authors.id,
+          user_likes.like_type
       ), liked_comments as (
         SELECT
           comments.id as id,
@@ -165,18 +164,17 @@ class User < ApplicationRecord
           comment_authors.id as author_id,
           comment_authors.username as author_username,
           comment_authors.display_name as author_display_name,
-          'CommentLike' as like_type
+          user_likes.like_type as like_type
         FROM comments
         INNER JOIN users comment_authors
           ON comments.author_id = comment_authors.id
-        WHERE comments.id IN (
-          SELECT user_likes.message_id as id
-          FROM user_likes
-          WHERE user_likes.like_type = 'CommentLike'
-        )
+        INNER JOIN user_likes
+          ON user_likes.message_id = comments.id
+          AND user_likes.like_type = 'CommentLike'
         GROUP BY
           comments.id,
-          comment_authors.id
+          comment_authors.id,
+          user_likes.like_type
       ), merged as (
         SELECT * FROM liked_posts
         UNION ALL
