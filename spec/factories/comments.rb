@@ -36,5 +36,15 @@ FactoryBot.define do
         )
       end
     end
+
+    trait :reposted do
+      transient do
+        repost_count { 1 }
+      end
+
+      after(:create) do |comment, evaluator|
+        create_list(:comment_repost, evaluator.repost_count, message_id: comment.id)
+      end
+    end
   end
 end
