@@ -128,86 +128,103 @@ class User < ApplicationRecord
   end
 
   def likes
-    ActiveRecord::Base.connection.select_all(<<~SQL.squish, "sql", [id]).to_a
-      WITH user_likes as (
+    results =
+      ActiveRecord::Base.connection.select_all(<<~SQL.squish, "sql", [id]).to_a
+        WITH user_likes as (
+          SELECT
+            likes.id as like_id,
+            likes.created_at as liked_at,
+            likes.type as like_type,
+            likes.message_id as message_id
+          FROM likes
+          WHERE likes.user_id = $1
+        ),liked_posts as (
+          SELECT
+            posts.id as id,
+            posts.text as text,
+            posts.created_at as created_at,
+            post_authors.id as author_id,
+            post_authors.username as author_username,
+            post_authors.display_name as author_display_name,
+            user_likes.like_id as like_id,
+            user_likes.liked_at as liked_at,
+            user_likes.like_type as like_type
+          FROM posts
+          INNER JOIN users post_authors
+            ON posts.author_id = post_authors.id
+          INNER JOIN user_likes
+            ON user_likes.message_id = posts.id
+            AND user_likes.like_type = 'PostLike'
+          GROUP BY
+            posts.id,
+            post_authors.id,
+            user_likes.like_id,
+            user_likes.liked_at,
+            user_likes.like_type
+        ), liked_comments as (
+          SELECT
+            comments.id as id,
+            comments.text as text,
+            comments.created_at as created_at,
+            comment_authors.id as author_id,
+            comment_authors.username as author_username,
+            comment_authors.display_name as author_display_name,
+            user_likes.like_id as like_id,
+            user_likes.liked_at as liked_at,
+            user_likes.like_type as like_type
+          FROM comments
+          INNER JOIN users comment_authors
+            ON comments.author_id = comment_authors.id
+          INNER JOIN user_likes
+            ON user_likes.message_id = comments.id
+            AND user_likes.like_type = 'CommentLike'
+          GROUP BY
+            comments.id,
+            comment_authors.id,
+            user_likes.like_id,
+            user_likes.liked_at,
+            user_likes.like_type
+        ), merged as (
+          SELECT * FROM liked_posts
+          UNION ALL
+          SELECT * FROM liked_comments
+        ), like_counts as (
+          SELECT
+            COUNT(likes.id) as like_count,
+            likes.message_id as message_id,
+            likes.type as message_type
+          FROM likes
+          INNER JOIN merged
+            ON likes.type = merged.like_type
+            AND likes.message_id = merged.id
+          GROUP BY
+            likes.type, likes.message_id
+        )
         SELECT
-          likes.id as like_id,
-          likes.created_at as liked_at,
-          likes.type as like_type,
-          likes.message_id as message_id
-        FROM likes
-        WHERE likes.user_id = $1
-      ),liked_posts as (
-        SELECT
-          posts.id as id,
-          posts.text as text,
-          posts.created_at as created_at,
-          post_authors.id as author_id,
-          post_authors.username as author_username,
-          post_authors.display_name as author_display_name,
-          user_likes.like_id as like_id,
-          user_likes.liked_at as liked_at,
-          user_likes.like_type as like_type
-        FROM posts
-        INNER JOIN users post_authors
-          ON posts.author_id = post_authors.id
-        INNER JOIN user_likes
-          ON user_likes.message_id = posts.id
-          AND user_likes.like_type = 'PostLike'
-        GROUP BY
-          posts.id,
-          post_authors.id,
-          user_likes.like_id,
-          user_likes.liked_at,
-          user_likes.like_type
-      ), liked_comments as (
-        SELECT
-          comments.id as id,
-          comments.text as text,
-          comments.created_at as created_at,
-          comment_authors.id as author_id,
-          comment_authors.username as author_username,
-          comment_authors.display_name as author_display_name,
-          user_likes.like_id as like_id,
-          user_likes.liked_at as liked_at,
-          user_likes.like_type as like_type
-        FROM comments
-        INNER JOIN users comment_authors
-          ON comments.author_id = comment_authors.id
-        INNER JOIN user_likes
-          ON user_likes.message_id = comments.id
-          AND user_likes.like_type = 'CommentLike'
-        GROUP BY
-          comments.id,
-          comment_authors.id,
-          user_likes.like_id,
-          user_likes.liked_at,
-          user_likes.like_type
-      ), merged as (
-        SELECT * FROM liked_posts
-        UNION ALL
-        SELECT * FROM liked_comments
-      ), like_counts as (
-        SELECT
-          COUNT(likes.id) as like_count,
-          likes.message_id as message_id,
-          likes.type as message_type
-        FROM likes
-        INNER JOIN merged
-          ON likes.type = merged.like_type
-          AND likes.message_id = merged.id
-        GROUP BY
-          likes.type, likes.message_id
-      )
-      SELECT
-        merged.*,
-        like_counts.like_count as like_count
-      FROM merged
-      INNER JOIN like_counts
-        ON like_counts.message_type = merged.like_type
-        AND like_counts.message_id = merged.id
-      ORDER BY merged.like_id DESC
-    SQL
+          merged.*,
+          like_counts.like_count as like_count
+        FROM merged
+        INNER JOIN like_counts
+          ON like_counts.message_type = merged.like_type
+          AND like_counts.message_id = merged.id
+        ORDER BY merged.like_id DESC
+      SQL
+
+    results.map do |result|
+      {
+        id: result["id"],
+        text: result["text"],
+        created_at: result["created_at"],
+        like_type: result["like_type"],
+        like_count: result["like_count"],
+        liked_at: result["liked_at"],
+        author: {
+          id: result["author_id"],
+          username: result["author_username"],
+          display_name: result["author_display_name"]
+        }
+      }
+    end
   end
 
   private

@@ -290,61 +290,66 @@ RSpec.describe "Like Requests" do
                 "id" => comment2.id,
                 "text" => comment2.text,
                 "created_at" => comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
-                "author_id" => comment2.author_id,
-                "author_username" => comment2.author.username,
-                "author_display_name" => comment2.author.display_name,
                 "like_type" => "CommentLike",
-                "like_id" => like5.id,
+                "like_count" => comment2_like_count + 1,
                 "liked_at" => like5.created_at.strftime("%Y-%m-%dT%T.%LZ"),
-                "like_count" => comment2_like_count + 1
+                "author" => {
+                  "id" => comment2.author_id,
+                  "username" => comment2.author.username,
+                  "display_name" => comment2.author.display_name
+                }
               },
               {
                 "id" => post1.id,
                 "text" => post1.text,
                 "created_at" => post1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
-                "author_id" => post1.author_id,
-                "author_username" => post1.author.username,
-                "author_display_name" => post1.author.display_name,
                 "like_type" => "PostLike",
-                "like_id" => like4.id,
+                "like_count" => post1_like_count + 1,
                 "liked_at" => like4.created_at.strftime("%Y-%m-%dT%T.%LZ"),
-                "like_count" => post1_like_count + 1
+                "author" => {
+                  "id" => post1.author_id,
+                  "username" => post1.author.username,
+                  "display_name" => post1.author.display_name
+                }
               },
               {
                 "id" => comment1.id,
                 "text" => comment1.text,
                 "created_at" => comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
-                "author_id" => comment1.author_id,
-                "author_username" => comment1.author.username,
-                "author_display_name" => comment1.author.display_name,
                 "like_type" => "CommentLike",
-                "like_id" => like3.id,
+                "like_count" => comment1_like_count + 1,
                 "liked_at" => like3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
-                "like_count" => comment1_like_count + 1
+                "author" => {
+                  "id" => comment1.author_id,
+                  "username" => comment1.author.username,
+                  "display_name" => comment1.author.display_name
+                }
               },
               {
                 "id" => reply1.id,
                 "text" => reply1.text,
                 "created_at" => reply1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
-                "author_id" => reply1.author_id,
-                "author_username" => reply1.author.username,
-                "author_display_name" => reply1.author.display_name,
                 "like_type" => "CommentLike",
-                "like_id" => like2.id,
+                "like_count" => reply1_like_count + 1,
                 "liked_at" => like2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
-                "like_count" => reply1_like_count + 1
+                "author" => {
+                  "id" => reply1.author_id,
+                  "username" => reply1.author.username,
+                  "display_name" => reply1.author.display_name
+                }
               },
               {
                 "id" => post2.id,
                 "text" => post2.text,
                 "created_at" => post2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
-                "author_id" => post2.author_id,
-                "author_username" => post2.author.username,
-                "author_display_name" => post2.author.display_name,
                 "like_type" => "PostLike",
-                "like_id" => like1.id,
+                "like_count" => post2_like_count + 1,
                 "liked_at" => like1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
-                "like_count" => post2_like_count + 1
+                "author" => {
+                  "id" => post2.author_id,
+                  "username" => post2.author.username,
+                  "display_name" => post2.author.display_name
+                }
               }
             ]
           }
