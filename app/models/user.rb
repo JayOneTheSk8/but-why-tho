@@ -164,7 +164,8 @@ class User < ApplicationRecord
             post_authors.display_name as author_display_name,
             user_likes.like_id as like_id,
             user_likes.liked_at as liked_at,
-            user_likes.like_type as like_type
+            user_likes.like_type as like_type,
+            'PostRepost' as repost_type
           FROM posts
           INNER JOIN users post_authors
             ON posts.author_id = post_authors.id
@@ -187,7 +188,8 @@ class User < ApplicationRecord
             comment_authors.display_name as author_display_name,
             user_likes.like_id as like_id,
             user_likes.liked_at as liked_at,
-            user_likes.like_type as like_type
+            user_likes.like_type as like_type,
+            'CommentRepost' as repost_type
           FROM comments
           INNER JOIN users comment_authors
             ON comments.author_id = comment_authors.id
@@ -215,14 +217,29 @@ class User < ApplicationRecord
             AND likes.message_id = merged.id
           GROUP BY
             likes.type, likes.message_id
+        ), repost_counts as (
+          SELECT
+            COUNT(reposts.id) as repost_count,
+            reposts.message_id as message_id,
+            reposts.type as message_type
+          FROM reposts
+          INNER JOIN merged
+            ON reposts.type = merged.repost_type
+            AND reposts.message_id = merged.id
+          GROUP BY
+            reposts.type, reposts.message_id
         )
         SELECT
           merged.*,
-          like_counts.like_count as like_count
+          like_counts.like_count as like_count,
+          COALESCE(repost_counts.repost_count, 0) as repost_count
         FROM merged
         INNER JOIN like_counts
           ON like_counts.message_type = merged.like_type
           AND like_counts.message_id = merged.id
+        LEFT OUTER JOIN repost_counts
+          ON repost_counts.message_type = merged.repost_type
+          AND repost_counts.message_id = merged.id
         ORDER BY merged.like_id DESC
       SQL
 
@@ -233,6 +250,7 @@ class User < ApplicationRecord
         created_at: result["created_at"],
         like_type: result["like_type"],
         like_count: result["like_count"],
+        repost_count: result["repost_count"],
         liked_at: result["liked_at"],
         author: {
           id: result["author_id"],
