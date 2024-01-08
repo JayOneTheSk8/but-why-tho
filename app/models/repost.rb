@@ -1,0 +1,1 @@
+class Repost < ApplicationRecord; end
