@@ -14,4 +14,10 @@ class Post < ApplicationRecord
     foreign_key: :message_id,
     dependent: :destroy
   )
+  has_many(
+    :reposts,
+    class_name: :PostRepost,
+    foreign_key: :message_id,
+    dependent: :destroy
+  )
 end

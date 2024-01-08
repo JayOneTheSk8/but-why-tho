@@ -17,6 +17,12 @@ class Comment < ApplicationRecord
     foreign_key: :message_id,
     dependent: :destroy
   )
+  has_many(
+    :reposts,
+    class_name: :CommentRepost,
+    foreign_key: :message_id,
+    dependent: :destroy
+  )
 
   validate :reply_and_parent_post_match
 

@@ -64,6 +64,22 @@ class User < ApplicationRecord
     source: :post
   )
 
+  has_many :comment_reposts, dependent: :destroy
+  has_many(
+    :reposted_comments,
+    -> { order("reposts.created_at DESC") },
+    through: :comment_reposts,
+    source: :comment
+  )
+
+  has_many :post_reposts, dependent: :destroy
+  has_many(
+    :reposted_posts,
+    -> { order("reposts.created_at DESC") },
+    through: :post_reposts,
+    source: :post
+  )
+
   after_initialize :ensure_session_token!
   before_save :downcase_email
 
