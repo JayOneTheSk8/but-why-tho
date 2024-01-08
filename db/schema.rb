@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_06_181051) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_08_183758) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -58,6 +58,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_06_181051) do
     t.check_constraint "length(text::text) <= 200", name: "text_maximum_length"
   end
 
+  create_table "reposts", force: :cascade do |t|
+    t.string "type", null: false
+    t.bigint "user_id", null: false
+    t.bigint "message_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["type", "message_id"], name: "index_reposts_on_type_and_message_id"
+    t.index ["type", "user_id", "message_id"], name: "index_reposts_on_type_and_user_id_and_message_id", unique: true
+    t.index ["type", "user_id"], name: "index_reposts_on_type_and_user_id"
+    t.index ["user_id"], name: "index_reposts_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.citext "username", null: false
     t.citext "email", null: false
@@ -78,4 +90,5 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_06_181051) do
   add_foreign_key "follows", "users", column: "follower_id"
   add_foreign_key "likes", "users"
   add_foreign_key "posts", "users", column: "author_id"
+  add_foreign_key "reposts", "users"
 end
