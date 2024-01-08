@@ -11,5 +11,20 @@ FactoryBot.define do
 
       parent_id { comment.id }
     end
+
+    trait :replied do
+      transient do
+        reply_count { 1 }
+      end
+
+      after(:create) do |comment, evaluator|
+        create_list(
+          :comment,
+          evaluator.comment_count,
+          post_id: post.id,
+          parent_id: comment.id
+        )
+      end
+    end
   end
 end
