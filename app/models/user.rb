@@ -48,6 +48,22 @@ class User < ApplicationRecord
     source: :follower
   )
 
+  has_many :comment_likes, dependent: :destroy
+  has_many(
+    :liked_comments,
+    -> { order("likes.created_at DESC") },
+    through: :comment_likes,
+    source: :comment
+  )
+
+  has_many :post_likes, dependent: :destroy
+  has_many(
+    :liked_posts,
+    -> { order("likes.created_at DESC") },
+    through: :post_likes,
+    source: :post
+  )
+
   after_initialize :ensure_session_token!
   before_save :downcase_email
 

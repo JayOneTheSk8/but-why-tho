@@ -11,6 +11,12 @@ class Comment < ApplicationRecord
     foreign_key: :parent_id,
     dependent: :destroy
   )
+  has_many(
+    :likes,
+    class_name: :CommentLike,
+    foreign_key: :message_id,
+    dependent: :destroy
+  )
 
   validate :reply_and_parent_post_match
 

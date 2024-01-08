@@ -8,4 +8,10 @@ class Post < ApplicationRecord
     -> { where(parent_id: nil) },
     dependent: :destroy
   )
+  has_many(
+    :likes,
+    class_name: :PostLike,
+    foreign_key: :message_id,
+    dependent: :destroy
+  )
 end
