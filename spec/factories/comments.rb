@@ -30,8 +30,8 @@ FactoryBot.define do
       after(:create) do |comment, evaluator|
         create_list(
           :comment,
-          evaluator.comment_count,
-          post_id: post.id,
+          evaluator.reply_count,
+          post_id: comment.post_id,
           parent_id: comment.id
         )
       end
