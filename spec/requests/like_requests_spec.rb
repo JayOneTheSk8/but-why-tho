@@ -265,15 +265,55 @@ RSpec.describe "Like Requests" do
       let(:post2_repost_count) { 3 }
       let(:comment1_repost_count) { 5 }
 
-      let!(:post1) { create(:post, :liked, like_count: post1_like_count) }
-      let!(:post2) { create(:post, :liked, :reposted, like_count: post2_like_count, repost_count: post2_repost_count) }
+      let(:post1_comment_count) { 4 }
+      let(:comment2_comment_count) { 2 }
+
+      let!(:post1) do
+        create(
+          :post,
+          :liked,
+          :commented_with_replies,
+          like_count: post1_like_count,
+          replied_comment_count: post1_comment_count
+        )
+      end
+      let!(:post2) do
+        create(
+          :post,
+          :liked,
+          :reposted,
+          like_count: post2_like_count,
+          repost_count: post2_repost_count
+        )
+      end
 
       let!(:comment1) do
-        create(:comment, :liked, :reposted, like_count: comment1_like_count, repost_count: comment1_repost_count)
+        create(
+          :comment,
+          :liked,
+          :reposted,
+          like_count: comment1_like_count,
+          repost_count: comment1_repost_count
+        )
       end
-      let!(:comment2) { create(:comment, :liked, like_count: comment2_like_count) }
+      let!(:comment2) do
+        create(
+          :comment,
+          :liked,
+          :replied,
+          like_count: comment2_like_count,
+          reply_count: comment2_comment_count
+        )
+      end
 
-      let!(:reply1) { create(:comment, :reply, :liked, like_count: reply1_like_count) }
+      let!(:reply1) do
+        create(
+          :comment,
+          :reply,
+          :liked,
+          like_count: reply1_like_count
+        )
+      end
 
       let(:user) { create(:user) }
 
@@ -302,6 +342,7 @@ RSpec.describe "Like Requests" do
                 "like_count" => comment2_like_count + 1,
                 "liked_at" => like5.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "repost_count" => 0,
+                "comment_count" => comment2_comment_count,
                 "author" => {
                   "id" => comment2.author_id,
                   "username" => comment2.author.username,
@@ -316,6 +357,7 @@ RSpec.describe "Like Requests" do
                 "like_count" => post1_like_count + 1,
                 "liked_at" => like4.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "repost_count" => 0,
+                "comment_count" => post1_comment_count,
                 "author" => {
                   "id" => post1.author_id,
                   "username" => post1.author.username,
@@ -330,6 +372,7 @@ RSpec.describe "Like Requests" do
                 "like_count" => comment1_like_count + 1,
                 "liked_at" => like3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "repost_count" => comment1_repost_count,
+                "comment_count" => 0,
                 "author" => {
                   "id" => comment1.author_id,
                   "username" => comment1.author.username,
@@ -344,6 +387,7 @@ RSpec.describe "Like Requests" do
                 "like_count" => reply1_like_count + 1,
                 "liked_at" => like2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "repost_count" => 0,
+                "comment_count" => 0,
                 "author" => {
                   "id" => reply1.author_id,
                   "username" => reply1.author.username,
@@ -358,6 +402,7 @@ RSpec.describe "Like Requests" do
                 "like_count" => post2_like_count + 1,
                 "liked_at" => like1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "repost_count" => post2_repost_count,
+                "comment_count" => 0,
                 "author" => {
                   "id" => post2.author_id,
                   "username" => post2.author.username,

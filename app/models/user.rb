@@ -165,13 +165,21 @@ class User < ApplicationRecord
             user_likes.like_id as like_id,
             user_likes.liked_at as liked_at,
             user_likes.like_type as like_type,
-            'PostRepost' as repost_type
+            'PostRepost' as repost_type,
+            COUNT(
+              CASE
+              WHEN post_comments.parent_id IS NULL
+                THEN post_comments.id
+              END
+            ) as comment_count
           FROM posts
           INNER JOIN users post_authors
             ON posts.author_id = post_authors.id
           INNER JOIN user_likes
             ON user_likes.message_id = posts.id
             AND user_likes.like_type = 'PostLike'
+          LEFT OUTER JOIN comments post_comments
+            ON post_comments.post_id = posts.id
           GROUP BY
             posts.id,
             post_authors.id,
@@ -189,13 +197,16 @@ class User < ApplicationRecord
             user_likes.like_id as like_id,
             user_likes.liked_at as liked_at,
             user_likes.like_type as like_type,
-            'CommentRepost' as repost_type
+            'CommentRepost' as repost_type,
+            COUNT(comment_replies.id) as comment_count
           FROM comments
           INNER JOIN users comment_authors
             ON comments.author_id = comment_authors.id
           INNER JOIN user_likes
             ON user_likes.message_id = comments.id
             AND user_likes.like_type = 'CommentLike'
+          LEFT OUTER JOIN comments comment_replies
+            ON comment_replies.parent_id = comments.id
           GROUP BY
             comments.id,
             comment_authors.id,
@@ -251,6 +262,7 @@ class User < ApplicationRecord
         like_type: result["like_type"],
         like_count: result["like_count"],
         repost_count: result["repost_count"],
+        comment_count: result["comment_count"],
         liked_at: result["liked_at"],
         author: {
           id: result["author_id"],
