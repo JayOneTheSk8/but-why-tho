@@ -143,10 +143,39 @@ class User < ApplicationRecord
     UserMailer.confirmation(self, confirmation_token).deliver_now
   end
 
-  def likes
+  def likes(current_user: nil)
+    binds = [
+      ActiveRecord::Relation::QueryAttribute.new(
+        "user_id",
+        id,
+        ActiveRecord::Type::Integer.new
+      ),
+      ActiveRecord::Relation::QueryAttribute.new(
+        "current_user_id",
+        current_user&.id || 0,
+        ActiveRecord::Type::Integer.new
+      )
+    ]
+
     results =
-      ActiveRecord::Base.connection.select_all(<<~SQL.squish, "sql", [id]).to_a
-        WITH user_reposts as (
+      ActiveRecord::Base.connection.select_all(<<~SQL.squish, "sql", binds).to_a
+        WITH current_user_reposts as (
+          SELECT
+            reposts.id as repost_id,
+            reposts.created_at as reposted_at,
+            reposts.type as repost_type,
+            reposts.message_id as message_id
+          FROM reposts
+          WHERE reposts.user_id = $2
+        ), current_user_likes as (
+          SELECT
+            likes.id as like_id,
+            likes.created_at as liked_at,
+            likes.type as like_type,
+            likes.message_id as message_id
+          FROM likes
+          WHERE likes.user_id = $2
+        ), user_reposts as (
           SELECT
             reposts.id as repost_id,
             reposts.created_at as reposted_at,
@@ -174,13 +203,22 @@ class User < ApplicationRecord
             user_likes.liked_at as liked_at,
             user_likes.like_type as like_type,
             'PostRepost' as repost_type,
-            TRUE as user_liked,
-            CASE
-            WHEN user_reposts.repost_id IS NOT NULL
-              THEN TRUE
-            ELSE
-              FALSE
-            END user_reposted,
+            (
+              CASE
+              WHEN current_user_likes.like_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_liked,
+            (
+              CASE
+              WHEN current_user_reposts.repost_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_reposted,
             COUNT(
               CASE
               WHEN post_comments.parent_id IS NULL
@@ -195,16 +233,20 @@ class User < ApplicationRecord
             AND user_likes.message_id = posts.id
           LEFT OUTER JOIN comments post_comments
             ON post_comments.post_id = posts.id
-          LEFT OUTER JOIN user_reposts
-            ON user_reposts.repost_type = 'PostRepost'
-            AND user_reposts.message_id = posts.id
+          LEFT OUTER JOIN current_user_likes
+            ON current_user_likes.like_type = 'PostLike'
+            AND current_user_likes.message_id = posts.id
+          LEFT OUTER JOIN current_user_reposts
+            ON current_user_reposts.repost_type = 'PostRepost'
+            AND current_user_reposts.message_id = posts.id
           GROUP BY
             posts.id,
             post_authors.id,
             user_likes.like_id,
             user_likes.liked_at,
             user_likes.like_type,
-            user_reposts.repost_id
+            current_user_likes.like_id,
+            current_user_reposts.repost_id
         ), liked_comments as (
           SELECT
             comments.id as id,
@@ -217,13 +259,22 @@ class User < ApplicationRecord
             user_likes.liked_at as liked_at,
             user_likes.like_type as like_type,
             'CommentRepost' as repost_type,
-            TRUE as user_liked,
-            CASE
-            WHEN user_reposts.repost_id IS NOT NULL
-              THEN TRUE
-            ELSE
-              FALSE
-            END user_reposted,
+            (
+              CASE
+              WHEN current_user_likes.like_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_liked,
+            (
+              CASE
+              WHEN current_user_reposts.repost_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_reposted,
             COUNT(comment_replies.id) as comment_count
           FROM comments
           INNER JOIN users comment_authors
@@ -233,16 +284,20 @@ class User < ApplicationRecord
             AND user_likes.message_id = comments.id
           LEFT OUTER JOIN comments comment_replies
             ON comment_replies.parent_id = comments.id
-          LEFT OUTER JOIN user_reposts
-            ON user_reposts.repost_type = 'CommentRepost'
-            AND user_reposts.message_id = comments.id
+          LEFT OUTER JOIN current_user_likes
+            ON current_user_likes.like_type = 'CommentLike'
+            AND current_user_likes.message_id = comments.id
+          LEFT OUTER JOIN current_user_reposts
+            ON current_user_reposts.repost_type = 'CommentRepost'
+            AND current_user_reposts.message_id = comments.id
           GROUP BY
             comments.id,
             comment_authors.id,
             user_likes.like_id,
             user_likes.liked_at,
             user_likes.like_type,
-            user_reposts.repost_id
+            current_user_likes.like_id,
+            current_user_reposts.repost_id
         ), merged as (
           SELECT * FROM liked_posts
           UNION ALL
