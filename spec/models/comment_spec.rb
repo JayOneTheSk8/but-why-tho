@@ -4,7 +4,7 @@ RSpec.describe Comment do
   it_behaves_like "text must be question(s)", :comment
 
   describe "#valid?" do
-    context "when reply's post matches parent's post" do
+    context "when reply's post is parent's post" do
       let!(:parent_comment) { create(:comment) }
       let(:reply_comment) { build(:comment, :reply, post: parent_comment.post, comment: parent_comment) }
 
@@ -13,11 +13,11 @@ RSpec.describe Comment do
       end
     end
 
-    context "when reply's post does not parent's post" do
+    context "when reply's post is not parent's post" do
       let!(:parent_comment) { create(:comment) }
       let(:reply_comment) { build(:comment, :reply, comment: parent_comment) }
 
-      it "is valid" do
+      it "is not valid" do
         expect(reply_comment).not_to be_valid
       end
     end
