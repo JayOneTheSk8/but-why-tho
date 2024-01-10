@@ -348,6 +348,7 @@ RSpec.describe "Like Requests" do
                 "comment_count" => comment2_comment_count,
                 "user_reposted" => false,
                 "user_liked" => false,
+                "user_followed" => false,
                 "replying_to" => [comment2.post.author.username],
                 "author" => {
                   "id" => comment2.author_id,
@@ -366,6 +367,7 @@ RSpec.describe "Like Requests" do
                 "comment_count" => post1_comment_count,
                 "user_reposted" => false,
                 "user_liked" => false,
+                "user_followed" => false,
                 "replying_to" => nil,
                 "author" => {
                   "id" => post1.author_id,
@@ -384,6 +386,7 @@ RSpec.describe "Like Requests" do
                 "comment_count" => 0,
                 "user_reposted" => false,
                 "user_liked" => false,
+                "user_followed" => false,
                 "replying_to" => [comment1.post.author.username],
                 "author" => {
                   "id" => comment1.author_id,
@@ -402,6 +405,7 @@ RSpec.describe "Like Requests" do
                 "comment_count" => 0,
                 "user_reposted" => false,
                 "user_liked" => false,
+                "user_followed" => false,
                 "replying_to" => [reply1.parent.author.username, reply1.post.author.username],
                 "author" => {
                   "id" => reply1.author_id,
@@ -420,6 +424,7 @@ RSpec.describe "Like Requests" do
                 "comment_count" => 0,
                 "user_reposted" => false,
                 "user_liked" => false,
+                "user_followed" => false,
                 "replying_to" => nil,
                 "author" => {
                   "id" => post2.author_id,
@@ -441,11 +446,13 @@ RSpec.describe "Like Requests" do
           create(:comment_like, user: current_user, message_id: comment1.id)
           create(:comment_repost, user: current_user, message_id: comment1.id)
           create(:post_repost, user: current_user, message_id: post2.id)
+          create(:follow, follower: current_user, followee: post1.author)
+          create(:follow, follower: current_user, followee: reply1.author)
 
           post("/sign_in", params: {user: {login: current_user.username, password: current_user_password}})
         end
 
-        it "returns whether or not the logged in user liked or reposted the post/comment" do
+        it "returns whether or not the logged in user liked or reposted the post/comment or followed the user" do
           get "/users/#{user.id}/likes"
           expect(response.parsed_body).to eq(
             {
@@ -461,6 +468,7 @@ RSpec.describe "Like Requests" do
                   "comment_count" => comment2_comment_count,
                   "user_reposted" => false,
                   "user_liked" => false,
+                  "user_followed" => false,
                   "replying_to" => [comment2.post.author.username],
                   "author" => {
                     "id" => comment2.author_id,
@@ -479,6 +487,7 @@ RSpec.describe "Like Requests" do
                   "comment_count" => post1_comment_count,
                   "user_reposted" => false,
                   "user_liked" => true,
+                  "user_followed" => true,
                   "replying_to" => nil,
                   "author" => {
                     "id" => post1.author_id,
@@ -497,6 +506,7 @@ RSpec.describe "Like Requests" do
                   "comment_count" => 0,
                   "user_reposted" => true,
                   "user_liked" => true,
+                  "user_followed" => false,
                   "replying_to" => [comment1.post.author.username],
                   "author" => {
                     "id" => comment1.author_id,
@@ -515,6 +525,7 @@ RSpec.describe "Like Requests" do
                   "comment_count" => 0,
                   "user_reposted" => false,
                   "user_liked" => false,
+                  "user_followed" => true,
                   "replying_to" => [reply1.parent.author.username, reply1.post.author.username],
                   "author" => {
                     "id" => reply1.author_id,
@@ -533,6 +544,7 @@ RSpec.describe "Like Requests" do
                   "comment_count" => 0,
                   "user_reposted" => true,
                   "user_liked" => false,
+                  "user_followed" => false,
                   "replying_to" => nil,
                   "author" => {
                     "id" => post2.author_id,
