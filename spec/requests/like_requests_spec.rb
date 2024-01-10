@@ -452,7 +452,7 @@ RSpec.describe "Like Requests" do
           post("/sign_in", params: {user: {login: current_user.username, password: current_user_password}})
         end
 
-        it "returns whether or not the logged in user liked or reposted the post/comment or followed the user" do
+        it "returns whether or not the logged in user liked or reposted the post/comment or followed the author" do
           get "/users/#{user.id}/likes"
           expect(response.parsed_body).to eq(
             {
