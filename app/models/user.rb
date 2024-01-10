@@ -203,6 +203,7 @@ class User < ApplicationRecord
             user_likes.liked_at as liked_at,
             user_likes.like_type as like_type,
             'PostRepost' as repost_type,
+            NULL as replying_to,
             (
               CASE
               WHEN current_user_likes.like_id IS NOT NULL
@@ -259,6 +260,18 @@ class User < ApplicationRecord
             user_likes.liked_at as liked_at,
             user_likes.like_type as like_type,
             'CommentRepost' as repost_type,
+            array_to_string(
+              ARRAY[
+                (
+                  CASE
+                  WHEN parent_comment.id IS NOT NULL
+                    THEN parent_comment_author.username
+                  END
+                ),
+                comment_post_author.username
+              ],
+              ','
+            ) as replying_to,
             (
               CASE
               WHEN current_user_likes.like_id IS NOT NULL
@@ -282,6 +295,14 @@ class User < ApplicationRecord
           INNER JOIN user_likes
             ON user_likes.like_type = 'CommentLike'
             AND user_likes.message_id = comments.id
+          INNER JOIN posts comment_post
+            ON comment_post.id = comments.post_id
+          INNER JOIN users comment_post_author
+            ON comment_post_author.id = comment_post.author_id
+          LEFT OUTER JOIN comments parent_comment
+            ON parent_comment.id = comments.parent_id
+          LEFT OUTER JOIN users parent_comment_author
+            ON parent_comment_author.id = parent_comment.author_id
           LEFT OUTER JOIN comments comment_replies
             ON comment_replies.parent_id = comments.id
           LEFT OUTER JOIN current_user_likes
@@ -297,7 +318,10 @@ class User < ApplicationRecord
             user_likes.liked_at,
             user_likes.like_type,
             current_user_likes.like_id,
-            current_user_reposts.repost_id
+            current_user_reposts.repost_id,
+            parent_comment.id,
+            comment_post_author.username,
+            parent_comment_author.username
         ), merged as (
           SELECT * FROM liked_posts
           UNION ALL
@@ -351,6 +375,7 @@ class User < ApplicationRecord
         liked_at: result["liked_at"],
         user_liked: result["user_liked"],
         user_reposted: result["user_reposted"],
+        replying_to: result["replying_to"].presence&.split(","),
         author: {
           id: result["author_id"],
           username: result["author_username"],

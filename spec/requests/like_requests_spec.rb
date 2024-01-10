@@ -348,6 +348,7 @@ RSpec.describe "Like Requests" do
                 "comment_count" => comment2_comment_count,
                 "user_reposted" => false,
                 "user_liked" => false,
+                "replying_to" => [comment2.post.author.username],
                 "author" => {
                   "id" => comment2.author_id,
                   "username" => comment2.author.username,
@@ -365,6 +366,7 @@ RSpec.describe "Like Requests" do
                 "comment_count" => post1_comment_count,
                 "user_reposted" => false,
                 "user_liked" => false,
+                "replying_to" => nil,
                 "author" => {
                   "id" => post1.author_id,
                   "username" => post1.author.username,
@@ -382,6 +384,7 @@ RSpec.describe "Like Requests" do
                 "comment_count" => 0,
                 "user_reposted" => false,
                 "user_liked" => false,
+                "replying_to" => [comment1.post.author.username],
                 "author" => {
                   "id" => comment1.author_id,
                   "username" => comment1.author.username,
@@ -399,6 +402,7 @@ RSpec.describe "Like Requests" do
                 "comment_count" => 0,
                 "user_reposted" => false,
                 "user_liked" => false,
+                "replying_to" => [reply1.parent.author.username, comment2.post.author.username],
                 "author" => {
                   "id" => reply1.author_id,
                   "username" => reply1.author.username,
@@ -416,6 +420,7 @@ RSpec.describe "Like Requests" do
                 "comment_count" => 0,
                 "user_reposted" => false,
                 "user_liked" => false,
+                "replying_to" => nil,
                 "author" => {
                   "id" => post2.author_id,
                   "username" => post2.author.username,
@@ -440,7 +445,7 @@ RSpec.describe "Like Requests" do
           post("/sign_in", params: {user: {login: current_user.username, password: current_user_password}})
         end
 
-        it "returns whether or not the user liked or reposted the post/comment" do
+        it "returns whether or not the logged in user liked or reposted the post/comment" do
           get "/users/#{user.id}/likes"
           expect(response.parsed_body).to eq(
             {
@@ -456,6 +461,7 @@ RSpec.describe "Like Requests" do
                   "comment_count" => comment2_comment_count,
                   "user_reposted" => false,
                   "user_liked" => false,
+                  "replying_to" => [comment2.post.author.username],
                   "author" => {
                     "id" => comment2.author_id,
                     "username" => comment2.author.username,
@@ -473,6 +479,7 @@ RSpec.describe "Like Requests" do
                   "comment_count" => post1_comment_count,
                   "user_reposted" => false,
                   "user_liked" => true,
+                  "replying_to" => nil,
                   "author" => {
                     "id" => post1.author_id,
                     "username" => post1.author.username,
@@ -490,6 +497,7 @@ RSpec.describe "Like Requests" do
                   "comment_count" => 0,
                   "user_reposted" => true,
                   "user_liked" => true,
+                  "replying_to" => [comment1.post.author.username],
                   "author" => {
                     "id" => comment1.author_id,
                     "username" => comment1.author.username,
@@ -507,6 +515,7 @@ RSpec.describe "Like Requests" do
                   "comment_count" => 0,
                   "user_reposted" => false,
                   "user_liked" => false,
+                  "replying_to" => [reply1.parent.author.username, reply1.post.author.username],
                   "author" => {
                     "id" => reply1.author_id,
                     "username" => reply1.author.username,
@@ -524,6 +533,7 @@ RSpec.describe "Like Requests" do
                   "comment_count" => 0,
                   "user_reposted" => true,
                   "user_liked" => false,
+                  "replying_to" => nil,
                   "author" => {
                     "id" => post2.author_id,
                     "username" => post2.author.username,
