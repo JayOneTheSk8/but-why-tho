@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_08_183758) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_10_062504) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -35,6 +35,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_08_183758) do
     t.index ["followee_id"], name: "index_follows_on_followee_id"
     t.index ["follower_id", "followee_id"], name: "index_follows_on_follower_id_and_followee_id", unique: true
     t.index ["follower_id"], name: "index_follows_on_follower_id"
+    t.check_constraint "follower_id <> followee_id", name: "different_follwer_and_followee"
   end
 
   create_table "likes", force: :cascade do |t|
