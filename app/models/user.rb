@@ -460,14 +460,6 @@ class User < ApplicationRecord
             reposts.message_id as message_id
           FROM reposts
           WHERE reposts.user_id = $1
-        ), user_likes as (
-          SELECT
-            likes.id as like_id,
-            likes.created_at as liked_at,
-            likes.type as like_type,
-            likes.message_id as message_id
-          FROM likes
-          WHERE likes.user_id = $1
         ), reposted_posts as (
           SELECT
             posts.id as id,
