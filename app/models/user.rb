@@ -144,18 +144,7 @@ class User < ApplicationRecord
   end
 
   def likes(current_user: nil)
-    binds = [
-      ActiveRecord::Relation::QueryAttribute.new(
-        "user_id",
-        id,
-        ActiveRecord::Type::Integer.new
-      ),
-      ActiveRecord::Relation::QueryAttribute.new(
-        "current_user_id",
-        current_user&.id || 0,
-        ActiveRecord::Type::Integer.new
-      )
-    ]
+    binds = bind_id_with_current_user_id_for_query(current_user)
 
     results =
       ActiveRecord::Base.connection.select_all(<<~SQL.squish, "User Liked Posts", binds).to_a
@@ -415,18 +404,7 @@ class User < ApplicationRecord
   end
 
   def linked_posts(current_user: nil)
-    binds = [
-      ActiveRecord::Relation::QueryAttribute.new(
-        "user_id",
-        id,
-        ActiveRecord::Type::Integer.new
-      ),
-      ActiveRecord::Relation::QueryAttribute.new(
-        "current_user_id",
-        current_user&.id || 0,
-        ActiveRecord::Type::Integer.new
-      )
-    ]
+    binds = bind_id_with_current_user_id_for_query(current_user)
 
     results =
       ActiveRecord::Base.connection.select_all(<<~SQL.squish, "User Linked Posts", binds).to_a
@@ -741,6 +719,21 @@ class User < ApplicationRecord
   end
 
   private
+
+  def bind_id_with_current_user_id_for_query(current_user)
+    [
+      ActiveRecord::Relation::QueryAttribute.new(
+        "user_id",
+        id,
+        ActiveRecord::Type::Integer.new
+      ),
+      ActiveRecord::Relation::QueryAttribute.new(
+        "current_user_id",
+        current_user&.id || 0,
+        ActiveRecord::Type::Integer.new
+      )
+    ]
+  end
 
   def ensure_session_token!
     self.session_token ||= SecureRandom.urlsafe_base64(32)
