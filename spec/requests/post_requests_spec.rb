@@ -657,6 +657,7 @@ RSpec.describe "Post Requests" do
                 "post_date" => reposted_reply_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "user_liked" => false,
                 "user_reposted" => false,
+                "user_followed" => false,
                 "replying_to" => [reposted_reply.parent.author.username, reposted_reply.post.author.username],
                 "author" => {
                   "id" => reposted_reply.author_id,
@@ -675,6 +676,7 @@ RSpec.describe "Post Requests" do
                 "post_date" => reposted_comment_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "user_liked" => false,
                 "user_reposted" => false,
+                "user_followed" => false,
                 "replying_to" => [reposted_comment.post.author.username],
                 "author" => {
                   "id" => reposted_comment.author_id,
@@ -693,6 +695,7 @@ RSpec.describe "Post Requests" do
                 "post_date" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "user_liked" => false,
                 "user_reposted" => false,
+                "user_followed" => false,
                 "replying_to" => nil,
                 "author" => {
                   "id" => user_post.author_id,
@@ -711,6 +714,7 @@ RSpec.describe "Post Requests" do
                 "post_date" => reposted_post_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "user_liked" => false,
                 "user_reposted" => false,
+                "user_followed" => false,
                 "replying_to" => nil,
                 "author" => {
                   "id" => reposted_post.author_id,
@@ -732,11 +736,13 @@ RSpec.describe "Post Requests" do
           create(:comment_like, user: current_user, message_id: reposted_reply.id)
           create(:comment_repost, user: current_user, message_id: reposted_comment.id)
           create(:post_repost, user: current_user, message_id: reposted_post.id)
+          create(:follow, follower: current_user, followee: reposted_reply.author)
+          create(:follow, follower: current_user, followee: reposted_post.author)
 
           post("/sign_in", params: {user: {login: current_user.username, password: current_user_password}})
         end
 
-        it "returns whether or not the logged in user liked or reposted the post/comment" do
+        it "returns whether or not the logged in user liked or reposted the post/comment or followed the user" do
           get "/users/#{user.id}/linked_posts"
           expect(response.parsed_body).to eq(
             {
@@ -752,6 +758,7 @@ RSpec.describe "Post Requests" do
                   "post_date" => reposted_reply_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                   "user_liked" => true,
                   "user_reposted" => false,
+                  "user_followed" => true,
                   "replying_to" => [reposted_reply.parent.author.username, reposted_reply.post.author.username],
                   "author" => {
                     "id" => reposted_reply.author_id,
@@ -770,6 +777,7 @@ RSpec.describe "Post Requests" do
                   "post_date" => reposted_comment_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                   "user_liked" => false,
                   "user_reposted" => true,
+                  "user_followed" => false,
                   "replying_to" => [reposted_comment.post.author.username],
                   "author" => {
                     "id" => reposted_comment.author_id,
@@ -788,6 +796,7 @@ RSpec.describe "Post Requests" do
                   "post_date" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                   "user_liked" => true,
                   "user_reposted" => false,
+                  "user_followed" => false,
                   "replying_to" => nil,
                   "author" => {
                     "id" => user_post.author_id,
@@ -806,6 +815,7 @@ RSpec.describe "Post Requests" do
                   "post_date" => reposted_post_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                   "user_liked" => false,
                   "user_reposted" => true,
+                  "user_followed" => true,
                   "replying_to" => nil,
                   "author" => {
                     "id" => reposted_post.author_id,

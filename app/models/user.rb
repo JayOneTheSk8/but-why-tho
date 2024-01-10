@@ -446,6 +446,12 @@ class User < ApplicationRecord
             likes.message_id as message_id
           FROM likes
           WHERE likes.user_id = $2
+        ), current_user_subscriptions as (
+          SELECT
+            follows.id as follow_id,
+            follows.followee_id as followee_id
+          FROM follows
+          WHERE follows.follower_id = $2
         ), user_reposts as (
           SELECT
             reposts.id as repost_id,
@@ -491,6 +497,14 @@ class User < ApplicationRecord
                 FALSE
               END
             ) user_reposted,
+            (
+              CASE
+              WHEN current_user_subscriptions.follow_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_followed,
             COUNT(
               CASE
               WHEN post_comments.parent_id IS NULL
@@ -511,13 +525,16 @@ class User < ApplicationRecord
           LEFT OUTER JOIN current_user_reposts
             ON current_user_reposts.repost_type = 'PostRepost'
             AND current_user_reposts.message_id = posts.id
+          LEFT OUTER JOIN current_user_subscriptions
+            ON current_user_subscriptions.followee_id = posts.author_id
           GROUP BY
             posts.id,
             post_authors.id,
             user_reposts.repost_type,
             user_reposts.reposted_at,
             current_user_likes.like_id,
-            current_user_reposts.repost_id
+            current_user_reposts.repost_id,
+            current_user_subscriptions.follow_id
         ), reposted_comments as (
           SELECT
             comments.id as id,
@@ -558,6 +575,14 @@ class User < ApplicationRecord
                 FALSE
               END
             ) user_reposted,
+            (
+              CASE
+              WHEN current_user_subscriptions.follow_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_followed,
             COUNT(comment_replies.id) as comment_count
           FROM comments
           INNER JOIN users comment_authors
@@ -581,6 +606,8 @@ class User < ApplicationRecord
           LEFT OUTER JOIN current_user_reposts
             ON current_user_reposts.repost_type = 'CommentRepost'
             AND current_user_reposts.message_id = comments.id
+          LEFT OUTER JOIN current_user_subscriptions
+            ON current_user_subscriptions.followee_id = comments.author_id
           GROUP BY
             comments.id,
             comment_authors.id,
@@ -590,7 +617,8 @@ class User < ApplicationRecord
             current_user_reposts.repost_id,
             parent_comment.id,
             comment_post_author.username,
-            parent_comment_author.username
+            parent_comment_author.username,
+            current_user_subscriptions.follow_id
         ), user_posts as (
           SELECT
             posts.id as id,
@@ -620,6 +648,14 @@ class User < ApplicationRecord
                 FALSE
               END
             ) user_reposted,
+            (
+              CASE
+              WHEN current_user_subscriptions.follow_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_followed,
             COUNT(
               CASE
               WHEN post_comments.parent_id IS NULL
@@ -637,12 +673,15 @@ class User < ApplicationRecord
           LEFT OUTER JOIN current_user_reposts
             ON current_user_reposts.repost_type = 'PostRepost'
             AND current_user_reposts.message_id = posts.id
+          LEFT OUTER JOIN current_user_subscriptions
+            ON current_user_subscriptions.followee_id = posts.author_id
           WHERE posts.author_id = $1
           GROUP BY
             posts.id,
             post_authors.id,
             current_user_likes.like_id,
-            current_user_reposts.repost_id
+            current_user_reposts.repost_id,
+            current_user_subscriptions.follow_id
         ), merged as (
           SELECT * FROM reposted_posts
           UNION ALL
@@ -698,6 +737,7 @@ class User < ApplicationRecord
         post_date: result["post_date"],
         user_liked: result["user_liked"],
         user_reposted: result["user_reposted"],
+        user_followed: result["user_followed"],
         replying_to: result["replying_to"].presence&.split(","),
         author: {
           id: result["author_id"],
