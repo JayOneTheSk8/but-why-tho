@@ -402,7 +402,7 @@ RSpec.describe "Like Requests" do
                 "comment_count" => 0,
                 "user_reposted" => false,
                 "user_liked" => false,
-                "replying_to" => [reply1.parent.author.username, comment2.post.author.username],
+                "replying_to" => [reply1.parent.author.username, reply1.post.author.username],
                 "author" => {
                   "id" => reply1.author_id,
                   "username" => reply1.author.username,
