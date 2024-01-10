@@ -70,7 +70,9 @@ RSpec.describe "Repost Requests" do
       it "creates a post repost for the user" do
         expect { post "/post_reposts", params: repost_params }
           .to change { PostRepost.count }.by(1)
-          .and change { PostRepost.find_by(user_id: user.id, message_id: post_to_repost.id).present? }.from(false).to(true)
+          .and change {
+            PostRepost.find_by(user_id: user.id, message_id: post_to_repost.id).present?
+          }.from(false).to(true)
 
         expect(response.parsed_body).to eq(
           {
@@ -198,7 +200,9 @@ RSpec.describe "Repost Requests" do
       it "deletes a post repost" do
         expect { delete "/post_reposts", params: repost_params }
           .to change { PostRepost.count }.by(-1)
-          .and change { PostRepost.find_by(user_id: user.id, message_id: reposted_post.id).present? }.from(true).to(false)
+          .and change {
+            PostRepost.find_by(user_id: user.id, message_id: reposted_post.id).present?
+          }.from(true).to(false)
 
         expect(response.parsed_body).to eq(
           {
