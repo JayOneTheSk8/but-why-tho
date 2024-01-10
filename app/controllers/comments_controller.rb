@@ -128,6 +128,22 @@ class CommentsController < ApplicationController
     render :user_comments
   end
 
+  def user_linked_comments
+    @user = User.find_by(id: params[:user_id])
+
+    if @user.present?
+      render(
+        json: {comments: @user.linked_comments(current_user:)},
+        status: :ok
+      )
+    else
+      render(
+        json: {errors: ["Unable to find user."]},
+        status: :not_found
+      )
+    end
+  end
+
   private
 
   def require_login
