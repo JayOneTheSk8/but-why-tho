@@ -562,4 +562,270 @@ RSpec.describe "Post Requests" do
       end
     end
   end
+
+  describe "GET /users/:user_id/linked_posts" do
+    context "when user exists" do
+      let(:password) { "P0s+erk1d" }
+      let!(:user) { create(:user, password:) }
+
+      let(:user_post_like_count) { 5 }
+      let(:user_post_repost_count) { 2 }
+      let(:user_post_comment_count) { 4 }
+
+      let(:reposted_post_like_count) { 3 }
+      let(:reposted_post_repost_count) { 1 }
+      let(:reposted_post_comment_count) { 7 }
+
+      let(:reposted_comment_like_count) { 6 }
+      let(:reposted_comment_repost_count) { 7 }
+      let(:reposted_comment_comment_count) { 2 }
+
+      let(:reposted_reply_like_count) { 9 }
+      let(:reposted_reply_repost_count) { 4 }
+      let(:reposted_reply_comment_count) { 1 }
+
+      let!(:reposted_post) do
+        create(
+          :post,
+          :liked,
+          :reposted,
+          :commented_with_replies,
+          like_count: reposted_post_like_count,
+          repost_count: reposted_post_repost_count,
+          replied_comment_count: reposted_post_comment_count
+        )
+      end
+      let!(:reposted_post_repost) { create(:post_repost, user:, message_id: reposted_post.id) }
+
+      let!(:reposted_comment) do
+        create(
+          :comment,
+          :liked,
+          :reposted,
+          :replied,
+          like_count: reposted_comment_like_count,
+          repost_count: reposted_comment_repost_count,
+          reply_count: reposted_comment_comment_count
+        )
+      end
+      let!(:reposted_reply) do
+        create(
+          :comment,
+          :liked,
+          :reposted,
+          :reply,
+          :replied,
+          like_count: reposted_reply_like_count,
+          repost_count: reposted_reply_repost_count,
+          reply_count: reposted_reply_comment_count
+        )
+      end
+      let!(:user_post) do
+        create(
+          :post,
+          :liked,
+          :reposted,
+          :commented,
+          author_id: user.id,
+          like_count: user_post_like_count,
+          repost_count: user_post_repost_count,
+          comment_count: user_post_comment_count
+        )
+      end
+      let!(:reposted_comment_repost) { create(:comment_repost, user:, message_id: reposted_comment.id) }
+      let!(:reposted_reply_repost) { create(:comment_repost, user:, message_id: reposted_reply.id) }
+
+      before do
+        create_list(:post, 4, :liked, :commented, :reposted)
+        create_list(:comment, 4, :liked, :replied, :reposted)
+        create_list(:comment, 4, :reply, :liked, :replied, :reposted)
+      end
+
+      it "returns their posts and reposted posts/comments" do
+        get "/users/#{user.id}/linked_posts"
+        expect(response.parsed_body).to eq(
+          {
+            "posts" => [
+              {
+                "id" => reposted_reply.id,
+                "text" => reposted_reply.text,
+                "created_at" => reposted_reply.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "CommentRepost",
+                "like_count" => reposted_reply_like_count,
+                "repost_count" => reposted_reply_repost_count + 1,
+                "comment_count" => reposted_reply_comment_count,
+                "post_date" => reposted_reply_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "replying_to" => [reposted_reply.parent.author.username, reposted_reply.post.author.username],
+                "author" => {
+                  "id" => reposted_reply.author_id,
+                  "username" => reposted_reply.author.username,
+                  "display_name" => reposted_reply.author.display_name
+                }
+              },
+              {
+                "id" => reposted_comment.id,
+                "text" => reposted_comment.text,
+                "created_at" => reposted_comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "CommentRepost",
+                "like_count" => reposted_comment_like_count,
+                "repost_count" => reposted_comment_repost_count + 1,
+                "comment_count" => reposted_comment_comment_count,
+                "post_date" => reposted_comment_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "replying_to" => [reposted_comment.post.author.username],
+                "author" => {
+                  "id" => reposted_comment.author_id,
+                  "username" => reposted_comment.author.username,
+                  "display_name" => reposted_comment.author.display_name
+                }
+              },
+              {
+                "id" => user_post.id,
+                "text" => user_post.text,
+                "created_at" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => user_post_like_count,
+                "repost_count" => user_post_repost_count,
+                "comment_count" => user_post_comment_count,
+                "post_date" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => user_post.author_id,
+                  "username" => user_post.author.username,
+                  "display_name" => user_post.author.display_name
+                }
+              },
+              {
+                "id" => reposted_post.id,
+                "text" => reposted_post.text,
+                "created_at" => reposted_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "PostRepost",
+                "like_count" => reposted_post_like_count,
+                "repost_count" => reposted_post_repost_count + 1,
+                "comment_count" => reposted_post_comment_count,
+                "post_date" => reposted_post_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => reposted_post.author_id,
+                  "username" => reposted_post.author.username,
+                  "display_name" => reposted_post.author.display_name
+                }
+              }
+            ]
+          }
+        )
+      end
+
+      context "when user is logged in" do
+        let(:current_user_password) { "N3wCUrr3n+U5er" }
+        let!(:current_user) { create(:user, password: current_user_password) }
+
+        before do
+          create(:post_like, user: current_user, message_id: user_post.id)
+          create(:comment_like, user: current_user, message_id: reposted_reply.id)
+          create(:comment_repost, user: current_user, message_id: reposted_comment.id)
+          create(:post_repost, user: current_user, message_id: reposted_post.id)
+
+          post("/sign_in", params: {user: {login: current_user.username, password: current_user_password}})
+        end
+
+        it "returns whether or not the logged in user liked or reposted the post/comment" do
+          get "/users/#{user.id}/linked_posts"
+          expect(response.parsed_body).to eq(
+            {
+              "posts" => [
+                {
+                  "id" => reposted_reply.id,
+                  "text" => reposted_reply.text,
+                  "created_at" => reposted_reply.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "CommentRepost",
+                  "like_count" => reposted_reply_like_count + 1,
+                  "repost_count" => reposted_reply_repost_count + 1,
+                  "comment_count" => reposted_reply_comment_count,
+                  "post_date" => reposted_reply_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => true,
+                  "user_reposted" => false,
+                  "replying_to" => [reposted_reply.parent.author.username, reposted_reply.post.author.username],
+                  "author" => {
+                    "id" => reposted_reply.author_id,
+                    "username" => reposted_reply.author.username,
+                    "display_name" => reposted_reply.author.display_name
+                  }
+                },
+                {
+                  "id" => reposted_comment.id,
+                  "text" => reposted_comment.text,
+                  "created_at" => reposted_comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "CommentRepost",
+                  "like_count" => reposted_comment_like_count,
+                  "repost_count" => reposted_comment_repost_count + 1 + 1,
+                  "comment_count" => reposted_comment_comment_count,
+                  "post_date" => reposted_comment_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => true,
+                  "replying_to" => [reposted_comment.post.author.username],
+                  "author" => {
+                    "id" => reposted_comment.author_id,
+                    "username" => reposted_comment.author.username,
+                    "display_name" => reposted_comment.author.display_name
+                  }
+                },
+                {
+                  "id" => user_post.id,
+                  "text" => user_post.text,
+                  "created_at" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => user_post_like_count + 1,
+                  "repost_count" => user_post_repost_count,
+                  "comment_count" => user_post_comment_count,
+                  "post_date" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => true,
+                  "user_reposted" => false,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => user_post.author_id,
+                    "username" => user_post.author.username,
+                    "display_name" => user_post.author.display_name
+                  }
+                },
+                {
+                  "id" => reposted_post.id,
+                  "text" => reposted_post.text,
+                  "created_at" => reposted_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "PostRepost",
+                  "like_count" => reposted_post_like_count,
+                  "repost_count" => reposted_post_repost_count + 1 + 1,
+                  "comment_count" => reposted_post_comment_count,
+                  "post_date" => reposted_post_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => true,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => reposted_post.author_id,
+                    "username" => reposted_post.author.username,
+                    "display_name" => reposted_post.author.display_name
+                  }
+                }
+              ]
+            }
+          )
+        end
+      end
+    end
+
+    context "when user does not exist" do
+      it "returns a not found error" do
+        get "/users/0/likes"
+        expect(response.parsed_body).to eq "errors" => ["Unable to find user."]
+        expect(response).to have_http_status :not_found
+      end
+    end
+  end
 end
