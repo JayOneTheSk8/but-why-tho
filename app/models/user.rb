@@ -718,6 +718,269 @@ class User < ApplicationRecord
     end
   end
 
+  def linked_comments(current_user: nil)
+    binds = bind_id_with_current_user_id_for_query(current_user)
+
+    results =
+      ActiveRecord::Base.connection.select_all(<<~SQL.squish, "User Linked Comments", binds).to_a
+        WITH current_user_reposts as (
+          SELECT
+            reposts.id as repost_id,
+            reposts.created_at as reposted_at,
+            reposts.type as repost_type,
+            reposts.message_id as message_id
+          FROM reposts
+          WHERE reposts.user_id = $2
+        ), current_user_likes as (
+          SELECT
+            likes.id as like_id,
+            likes.created_at as liked_at,
+            likes.type as like_type,
+            likes.message_id as message_id
+          FROM likes
+          WHERE likes.user_id = $2
+        ), current_user_subscriptions as (
+          SELECT
+            follows.id as follow_id,
+            follows.followee_id as followee_id
+          FROM follows
+          WHERE follows.follower_id = $2
+        ), user_reposts as (
+          SELECT
+            reposts.id as repost_id,
+            reposts.created_at as reposted_at,
+            reposts.type as repost_type,
+            reposts.message_id as message_id
+          FROM reposts
+          WHERE reposts.user_id = $1
+        ), reposted_comments as (
+          SELECT
+            comments.id as id,
+            comments.text as text,
+            comments.created_at as created_at,
+            comment_authors.id as author_id,
+            comment_authors.username as author_username,
+            comment_authors.display_name as author_display_name,
+            user_reposts.reposted_at as post_date,
+            user_reposts.repost_type as post_type,
+            user_reposts.repost_type as repost_type,
+            'CommentLike' as like_type,
+            array_to_string(
+              ARRAY[
+                (
+                  CASE
+                  WHEN parent_comment.id IS NOT NULL
+                    THEN parent_comment_author.username
+                  END
+                ),
+                comment_post_author.username
+              ],
+              ','
+            ) as replying_to,
+            (
+              CASE
+              WHEN current_user_likes.like_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_liked,
+            (
+              CASE
+              WHEN current_user_reposts.repost_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_reposted,
+            (
+              CASE
+              WHEN current_user_subscriptions.follow_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_followed,
+            COUNT(comment_replies.id) as comment_count
+          FROM comments
+          INNER JOIN users comment_authors
+            ON comments.author_id = comment_authors.id
+          INNER JOIN user_reposts
+            ON user_reposts.repost_type = 'CommentRepost'
+            AND user_reposts.message_id = comments.id
+          INNER JOIN posts comment_post
+            ON comment_post.id = comments.post_id
+          INNER JOIN users comment_post_author
+            ON comment_post_author.id = comment_post.author_id
+          LEFT OUTER JOIN comments parent_comment
+            ON parent_comment.id = comments.parent_id
+          LEFT OUTER JOIN users parent_comment_author
+            ON parent_comment_author.id = parent_comment.author_id
+          LEFT OUTER JOIN comments comment_replies
+            ON comment_replies.parent_id = comments.id
+          LEFT OUTER JOIN current_user_likes
+            ON current_user_likes.like_type = 'CommentLike'
+            AND current_user_likes.message_id = comments.id
+          LEFT OUTER JOIN current_user_reposts
+            ON current_user_reposts.repost_type = 'CommentRepost'
+            AND current_user_reposts.message_id = comments.id
+          LEFT OUTER JOIN current_user_subscriptions
+            ON current_user_subscriptions.followee_id = comments.author_id
+          GROUP BY
+            comments.id,
+            comment_authors.id,
+            user_reposts.repost_type,
+            user_reposts.reposted_at,
+            current_user_likes.like_id,
+            current_user_reposts.repost_id,
+            parent_comment.id,
+            comment_post_author.username,
+            parent_comment_author.username,
+            current_user_subscriptions.follow_id
+        ), user_comments as (
+          SELECT
+            comments.id as id,
+            comments.text as text,
+            comments.created_at as created_at,
+            comment_authors.id as author_id,
+            comment_authors.username as author_username,
+            comment_authors.display_name as author_display_name,
+            comments.created_at as post_date,
+            'Comment' as post_type,
+            'CommentRepost' as repost_type,
+            'CommentLike' as like_type,
+            array_to_string(
+              ARRAY[
+                (
+                  CASE
+                  WHEN parent_comment.id IS NOT NULL
+                    THEN parent_comment_author.username
+                  END
+                ),
+                comment_post_author.username
+              ],
+              ','
+            ) as replying_to,
+            (
+              CASE
+              WHEN current_user_likes.like_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_liked,
+            (
+              CASE
+              WHEN current_user_reposts.repost_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_reposted,
+            (
+              CASE
+              WHEN current_user_subscriptions.follow_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_followed,
+            COUNT(comment_replies.id) as comment_count
+          FROM comments
+          INNER JOIN users comment_authors
+            ON comments.author_id = comment_authors.id
+          INNER JOIN posts comment_post
+            ON comment_post.id = comments.post_id
+          INNER JOIN users comment_post_author
+            ON comment_post_author.id = comment_post.author_id
+          LEFT OUTER JOIN comments parent_comment
+            ON parent_comment.id = comments.parent_id
+          LEFT OUTER JOIN users parent_comment_author
+            ON parent_comment_author.id = parent_comment.author_id
+          LEFT OUTER JOIN comments comment_replies
+            ON comment_replies.parent_id = comments.id
+          LEFT OUTER JOIN current_user_likes
+            ON current_user_likes.like_type = 'CommentLike'
+            AND current_user_likes.message_id = comments.id
+          LEFT OUTER JOIN current_user_reposts
+            ON current_user_reposts.repost_type = 'CommentRepost'
+            AND current_user_reposts.message_id = comments.id
+          LEFT OUTER JOIN current_user_subscriptions
+            ON current_user_subscriptions.followee_id = comments.author_id
+          WHERE comments.author_id = $1
+          GROUP BY
+            comments.id,
+            comment_authors.id,
+            current_user_likes.like_id,
+            current_user_reposts.repost_id,
+            parent_comment.id,
+            comment_post_author.username,
+            parent_comment_author.username,
+            current_user_subscriptions.follow_id
+        ), merged as (
+          SELECT * FROM reposted_comments
+          UNION ALL
+          SELECT * FROM user_comments
+        ), like_counts as (
+          SELECT
+            COUNT(likes.id) as like_count,
+            likes.message_id as message_id,
+            likes.type as message_type
+          FROM likes
+          INNER JOIN merged
+            ON likes.type = merged.like_type
+            AND likes.message_id = merged.id
+          GROUP BY
+            likes.type, likes.message_id
+        ), repost_counts as (
+          SELECT
+            COUNT(reposts.id) as repost_count,
+            reposts.message_id as message_id,
+            reposts.type as message_type
+          FROM reposts
+          INNER JOIN merged
+            ON reposts.type = merged.repost_type
+            AND reposts.message_id = merged.id
+          GROUP BY
+            reposts.type, reposts.message_id
+        )
+        SELECT
+          merged.*,
+          COALESCE(like_counts.like_count, 0) as like_count,
+          COALESCE(repost_counts.repost_count, 0) as repost_count
+        FROM merged
+        LEFT OUTER JOIN like_counts
+          ON like_counts.message_type = merged.like_type
+          AND like_counts.message_id = merged.id
+        LEFT OUTER JOIN repost_counts
+          ON repost_counts.message_type = merged.repost_type
+          AND repost_counts.message_id = merged.id
+        ORDER BY merged.post_date DESC
+      SQL
+
+    results.map do |result|
+      {
+        id: result["id"],
+        text: result["text"],
+        created_at: result["created_at"],
+        post_type: result["post_type"],
+        like_count: result["like_count"],
+        repost_count: result["repost_count"],
+        comment_count: result["comment_count"],
+        post_date: result["post_date"],
+        user_liked: result["user_liked"],
+        user_reposted: result["user_reposted"],
+        user_followed: result["user_followed"],
+        replying_to: result["replying_to"].presence&.split(","),
+        author: {
+          id: result["author_id"],
+          username: result["author_username"],
+          display_name: result["author_display_name"]
+        }
+      }
+    end
+  end
+
   private
 
   def bind_id_with_current_user_id_for_query(current_user)
