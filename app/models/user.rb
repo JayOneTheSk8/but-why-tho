@@ -158,7 +158,7 @@ class User < ApplicationRecord
     ]
 
     results =
-      ActiveRecord::Base.connection.select_all(<<~SQL.squish, "sql", binds).to_a
+      ActiveRecord::Base.connection.select_all(<<~SQL.squish, "User Liked Posts", binds).to_a
         WITH current_user_reposts as (
           SELECT
             reposts.id as repost_id,
