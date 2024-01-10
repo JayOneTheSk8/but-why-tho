@@ -108,6 +108,22 @@ class PostsController < ApplicationController
     render :index
   end
 
+  def user_linked_posts
+    @user = User.find_by(id: params[:user_id])
+
+    if @user.present?
+      render(
+        json: {posts: @user.linked_posts(current_user:)},
+        status: :ok
+      )
+    else
+      render(
+        json: {errors: ["Unable to find user."]},
+        status: :not_found
+      )
+    end
+  end
+
   private
 
   def require_login
