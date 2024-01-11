@@ -838,4 +838,1299 @@ RSpec.describe "Post Requests" do
       end
     end
   end
+
+  describe "front pages" do
+    # rubocop:disable Rails/DurationArithmetic, Rails/SkipsModelValidations
+    let(:todays_post1_comment_count) { 4 }
+    let(:todays_post1_like_count) { 6 }
+    let(:todays_post1_repost_count) { 5 }
+
+    let(:todays_post2_comment_count) { 2 }
+    let(:todays_post2_like_count) { 2 }
+    let(:todays_post2_repost_count) { 6 }
+
+    let(:todays_post3_comment_count) { 1 }
+    let(:todays_post3_like_count) { 7 }
+    let(:todays_post3_repost_count) { 8 }
+
+    let(:todays_post4_comment_count) { 7 }
+    let(:todays_post4_like_count) { 9 }
+    let(:todays_post4_repost_count) { 2 }
+
+    let(:todays_post5_comment_count) { 9 }
+    let(:todays_post5_like_count) { 3 }
+    let(:todays_post5_repost_count) { 1 }
+
+    let(:todays_comment1_repost_count) { 6 }
+    let(:todays_comment2_repost_count) { 5 }
+
+    let!(:todays_post1) do
+      # Rating 31
+      create(
+        :post,
+        :commented,
+        :liked,
+        :reposted,
+        comment_count: todays_post1_comment_count,
+        like_count: todays_post1_like_count,
+        repost_count: todays_post1_repost_count
+      )
+    end
+    let!(:todays_post2) do
+      # Rating 24
+      create(
+        :post,
+        :commented,
+        :liked,
+        :reposted,
+        comment_count: todays_post2_comment_count,
+        like_count: todays_post2_like_count,
+        repost_count: todays_post2_repost_count
+      )
+    end
+    let!(:todays_post3) do
+      # Rating 39
+      create(
+        :post,
+        :commented,
+        :liked,
+        :reposted,
+        comment_count: todays_post3_comment_count,
+        like_count: todays_post3_like_count,
+        repost_count: todays_post3_repost_count
+      )
+    end
+    let!(:todays_post4) do
+      # Rating 31 but more recent than todays_post1
+      create(
+        :post,
+        :commented,
+        :liked,
+        :reposted,
+        comment_count: todays_post4_comment_count,
+        like_count: todays_post4_like_count,
+        repost_count: todays_post4_repost_count
+      )
+    end
+    let!(:todays_post5) do
+      # Rating 18
+      create(
+        :post,
+        :commented,
+        :liked,
+        :reposted,
+        comment_count: todays_post5_comment_count,
+        like_count: todays_post5_like_count,
+        repost_count: todays_post5_repost_count
+      )
+    end
+
+    let!(:todays_comment1) { create(:comment, :reposted, repost_count: todays_comment1_repost_count) } # Rating 18
+    let!(:todays_comment2) { create(:comment, :reposted, repost_count: todays_comment2_repost_count) } # Rating 15
+    let!(:todays_comment1_post) { todays_comment1.post } # Rating 1
+    let!(:todays_comment2_post) { todays_comment2.post } # Rating 1
+
+    let(:earlier_post1_comment_count) { 3 }
+    let(:earlier_post1_like_count) { 2 }
+    let(:earlier_post1_repost_count) { 6 }
+
+    let(:earlier_post2_comment_count) { 4 }
+    let(:earlier_post2_like_count) { 3 }
+    let(:earlier_post2_repost_count) { 8 }
+
+    let(:earlier_post3_comment_count) { 6 }
+    let(:earlier_post3_like_count) { 1 }
+    let(:earlier_post3_repost_count) { 2 }
+
+    let(:earlier_post4_comment_count) { 2 }
+    let(:earlier_post4_like_count) { 2 }
+    let(:earlier_post4_repost_count) { 1 }
+
+    let(:earlier_post5_comment_count) { 1 }
+    let(:earlier_post5_like_count) { 4 }
+    let(:earlier_post5_repost_count) { 7 }
+
+    let(:earlier_comment1_repost_count) { 5 }
+
+    let!(:earlier_post1) do
+      # Rating 25
+      create(
+        :post,
+        :commented,
+        :liked,
+        :reposted,
+        comment_count: earlier_post1_comment_count,
+        like_count: earlier_post1_like_count,
+        repost_count: earlier_post1_repost_count,
+        created_at: Time.current - 2.days
+      )
+      # ) do |post|
+      #   post.update_column(:created_at, Time.current - 2.days)
+      # end
+    end
+    let!(:earlier_post2) do
+      # Rating 34
+      create(
+        :post,
+        :commented,
+        :liked,
+        :reposted,
+        comment_count: earlier_post2_comment_count,
+        like_count: earlier_post2_like_count,
+        repost_count: earlier_post2_repost_count,
+        created_at: Time.current - 2.days
+      )
+      # ) do |post|
+      #   post.update_column(:created_at, Time.current - 2.days)
+      # end
+    end
+    let!(:earlier_post3) do
+      # Rating 14
+      create(
+        :post,
+        :commented,
+        :liked,
+        :reposted,
+        comment_count: earlier_post3_comment_count,
+        like_count: earlier_post3_like_count,
+        repost_count: earlier_post3_repost_count,
+        created_at: Time.current - 2.days
+      )
+      # ) do |post|
+      #   post.update_column(:created_at, Time.current - 2.days)
+      # end
+    end
+    let!(:earlier_post4) do
+      # Rating 9
+      create(
+        :post,
+        :commented,
+        :liked,
+        :reposted,
+        comment_count: earlier_post4_comment_count,
+        like_count: earlier_post4_like_count,
+        repost_count: earlier_post4_repost_count,
+        created_at: Time.current - 2.days
+      )
+      # ) do |post|
+      #   post.update_column(:created_at, Time.current - 2.days)
+      # end
+    end
+    let!(:earlier_post5) do
+      # Rating 30
+      create(
+        :post,
+        :commented,
+        :liked,
+        :reposted,
+        comment_count: earlier_post5_comment_count,
+        like_count: earlier_post5_like_count,
+        repost_count: earlier_post5_repost_count,
+        created_at: Time.current - 2.days
+      )
+      # ) do |post|
+      #   post.update_column(:created_at, Time.current - 2.days)
+      # end
+    end
+
+    let!(:earlier_comment1) do
+      # Rating 15
+      create(:comment, :reposted, repost_count: earlier_comment1_repost_count, created_at: Time.current - 2.days)
+    end
+    let!(:earlier_comment1_post) { earlier_comment1.post } # Rating 1
+    let!(:post_with_irrelevant_comment1) { create(:comment, :reposted, repost_count: 4).post } # Rating 1
+    let!(:post_with_irrelevant_comment2) { create(:comment, :liked, like_count: 7).post } # Rating 1
+
+    let(:post_with_irrelevant_comment3_comment_count) { 8 }
+    let!(:post_with_irrelevant_comment3) do
+      # Rating 8
+      create(:comment, :replied, reply_count: post_with_irrelevant_comment3_comment_count - 1).post
+    end
+
+    before do
+      earlier_comment1_post.update_columns(created_at: Time.current - 2.days)
+      post_with_irrelevant_comment1.update_columns(created_at: Time.current - 2.days)
+      post_with_irrelevant_comment2.update_columns(created_at: Time.current - 2.days)
+      post_with_irrelevant_comment3.update_columns(created_at: Time.current - 2.days)
+    end
+
+    describe "GET /posts/front_page" do
+      it "gets the most popular posts and highly reposted comments, sorting them by date and most popular" do
+        get "/front_page"
+        expect(response.parsed_body).to eq(
+          {
+            "posts" => [
+              {
+                "id" => todays_post3.id,
+                "text" => todays_post3.text,
+                "created_at" => todays_post3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => todays_post3_like_count,
+                "repost_count" => todays_post3_repost_count,
+                "comment_count" => todays_post3_comment_count,
+                "post_date" => todays_post3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 39,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => todays_post3.author_id,
+                  "username" => todays_post3.author.username,
+                  "display_name" => todays_post3.author.display_name
+                }
+              },
+              {
+                "id" => todays_post4.id,
+                "text" => todays_post4.text,
+                "created_at" => todays_post4.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => todays_post4_like_count,
+                "repost_count" => todays_post4_repost_count,
+                "comment_count" => todays_post4_comment_count,
+                "post_date" => todays_post4.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 31,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => todays_post4.author_id,
+                  "username" => todays_post4.author.username,
+                  "display_name" => todays_post4.author.display_name
+                }
+              },
+              {
+                "id" => todays_post1.id,
+                "text" => todays_post1.text,
+                "created_at" => todays_post1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => todays_post1_like_count,
+                "repost_count" => todays_post1_repost_count,
+                "comment_count" => todays_post1_comment_count,
+                "post_date" => todays_post1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 31,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => todays_post1.author_id,
+                  "username" => todays_post1.author.username,
+                  "display_name" => todays_post1.author.display_name
+                }
+              },
+              {
+                "id" => todays_post2.id,
+                "text" => todays_post2.text,
+                "created_at" => todays_post2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => todays_post2_like_count,
+                "repost_count" => todays_post2_repost_count,
+                "comment_count" => todays_post2_comment_count,
+                "post_date" => todays_post2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 24,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => todays_post2.author_id,
+                  "username" => todays_post2.author.username,
+                  "display_name" => todays_post2.author.display_name
+                }
+              },
+              {
+                "id" => todays_comment1.id,
+                "text" => todays_comment1.text,
+                "created_at" => todays_comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "CommentRepost",
+                "like_count" => 0,
+                "repost_count" => todays_comment1_repost_count,
+                "comment_count" => 0,
+                "post_date" => todays_comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 18,
+                "replying_to" => [todays_comment1.post.author.username],
+                "author" => {
+                  "id" => todays_comment1.author_id,
+                  "username" => todays_comment1.author.username,
+                  "display_name" => todays_comment1.author.display_name
+                }
+              },
+              {
+                "id" => todays_post5.id,
+                "text" => todays_post5.text,
+                "created_at" => todays_post5.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => todays_post5_like_count,
+                "repost_count" => todays_post5_repost_count,
+                "comment_count" => todays_post5_comment_count,
+                "post_date" => todays_post5.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 18,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => todays_post5.author_id,
+                  "username" => todays_post5.author.username,
+                  "display_name" => todays_post5.author.display_name
+                }
+              },
+              {
+                "id" => todays_comment2.id,
+                "text" => todays_comment2.text,
+                "created_at" => todays_comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "CommentRepost",
+                "like_count" => 0,
+                "repost_count" => todays_comment2_repost_count,
+                "comment_count" => 0,
+                "post_date" => todays_comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 15,
+                "replying_to" => [todays_comment2.post.author.username],
+                "author" => {
+                  "id" => todays_comment2.author_id,
+                  "username" => todays_comment2.author.username,
+                  "display_name" => todays_comment2.author.display_name
+                }
+              },
+              {
+                "id" => todays_comment2_post.id,
+                "text" => todays_comment2_post.text,
+                "created_at" => todays_comment2_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => 0,
+                "repost_count" => 0,
+                "comment_count" => 1,
+                "post_date" => todays_comment2_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 1,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => todays_comment2_post.author_id,
+                  "username" => todays_comment2_post.author.username,
+                  "display_name" => todays_comment2_post.author.display_name
+                }
+              },
+              {
+                "id" => todays_comment1_post.id,
+                "text" => todays_comment1_post.text,
+                "created_at" => todays_comment1_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => 0,
+                "repost_count" => 0,
+                "comment_count" => 1,
+                "post_date" => todays_comment1_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 1,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => todays_comment1_post.author_id,
+                  "username" => todays_comment1_post.author.username,
+                  "display_name" => todays_comment1_post.author.display_name
+                }
+              },
+              {
+                "id" => earlier_post2.id,
+                "text" => earlier_post2.text,
+                "created_at" => earlier_post2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => earlier_post2_like_count,
+                "repost_count" => earlier_post2_repost_count,
+                "comment_count" => earlier_post2_comment_count,
+                "post_date" => earlier_post2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 34,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => earlier_post2.author_id,
+                  "username" => earlier_post2.author.username,
+                  "display_name" => earlier_post2.author.display_name
+                }
+              },
+              {
+                "id" => earlier_post5.id,
+                "text" => earlier_post5.text,
+                "created_at" => earlier_post5.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => earlier_post5_like_count,
+                "repost_count" => earlier_post5_repost_count,
+                "comment_count" => earlier_post5_comment_count,
+                "post_date" => earlier_post5.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 30,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => earlier_post5.author_id,
+                  "username" => earlier_post5.author.username,
+                  "display_name" => earlier_post5.author.display_name
+                }
+              },
+              {
+                "id" => earlier_post1.id,
+                "text" => earlier_post1.text,
+                "created_at" => earlier_post1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => earlier_post1_like_count,
+                "repost_count" => earlier_post1_repost_count,
+                "comment_count" => earlier_post1_comment_count,
+                "post_date" => earlier_post1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 25,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => earlier_post1.author_id,
+                  "username" => earlier_post1.author.username,
+                  "display_name" => earlier_post1.author.display_name
+                }
+              },
+              {
+                "id" => earlier_comment1.id,
+                "text" => earlier_comment1.text,
+                "created_at" => earlier_comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "CommentRepost",
+                "like_count" => 0,
+                "repost_count" => earlier_comment1_repost_count,
+                "comment_count" => 0,
+                "post_date" => earlier_comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 15,
+                "replying_to" => [earlier_comment1.post.author.username],
+                "author" => {
+                  "id" => earlier_comment1.author_id,
+                  "username" => earlier_comment1.author.username,
+                  "display_name" => earlier_comment1.author.display_name
+                }
+              },
+              {
+                "id" => earlier_post3.id,
+                "text" => earlier_post3.text,
+                "created_at" => earlier_post3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => earlier_post3_like_count,
+                "repost_count" => earlier_post3_repost_count,
+                "comment_count" => earlier_post3_comment_count,
+                "post_date" => earlier_post3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 14,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => earlier_post3.author_id,
+                  "username" => earlier_post3.author.username,
+                  "display_name" => earlier_post3.author.display_name
+                }
+              },
+              {
+                "id" => earlier_post4.id,
+                "text" => earlier_post4.text,
+                "created_at" => earlier_post4.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => earlier_post4_like_count,
+                "repost_count" => earlier_post4_repost_count,
+                "comment_count" => earlier_post4_comment_count,
+                "post_date" => earlier_post4.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 9,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => earlier_post4.author_id,
+                  "username" => earlier_post4.author.username,
+                  "display_name" => earlier_post4.author.display_name
+                }
+              },
+              {
+                "id" => post_with_irrelevant_comment3.id,
+                "text" => post_with_irrelevant_comment3.text,
+                "created_at" => post_with_irrelevant_comment3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => 0,
+                "repost_count" => 0,
+                "comment_count" => post_with_irrelevant_comment3_comment_count,
+                "post_date" => post_with_irrelevant_comment3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 8,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => post_with_irrelevant_comment3.author_id,
+                  "username" => post_with_irrelevant_comment3.author.username,
+                  "display_name" => post_with_irrelevant_comment3.author.display_name
+                }
+              },
+              {
+                "id" => post_with_irrelevant_comment2.id,
+                "text" => post_with_irrelevant_comment2.text,
+                "created_at" => post_with_irrelevant_comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => 0,
+                "repost_count" => 0,
+                "comment_count" => 1,
+                "post_date" => post_with_irrelevant_comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 1,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => post_with_irrelevant_comment2.author_id,
+                  "username" => post_with_irrelevant_comment2.author.username,
+                  "display_name" => post_with_irrelevant_comment2.author.display_name
+                }
+              },
+              {
+                "id" => post_with_irrelevant_comment1.id,
+                "text" => post_with_irrelevant_comment1.text,
+                "created_at" => post_with_irrelevant_comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => 0,
+                "repost_count" => 0,
+                "comment_count" => 1,
+                "post_date" => post_with_irrelevant_comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 1,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => post_with_irrelevant_comment1.author_id,
+                  "username" => post_with_irrelevant_comment1.author.username,
+                  "display_name" => post_with_irrelevant_comment1.author.display_name
+                }
+              },
+              {
+                "id" => earlier_comment1_post.id,
+                "text" => earlier_comment1_post.text,
+                "created_at" => earlier_comment1_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "post_type" => "Post",
+                "like_count" => 0,
+                "repost_count" => 0,
+                "comment_count" => 1,
+                "post_date" => earlier_comment1_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "rating" => 1,
+                "replying_to" => nil,
+                "author" => {
+                  "id" => earlier_comment1_post.author_id,
+                  "username" => earlier_comment1_post.author.username,
+                  "display_name" => earlier_comment1_post.author.display_name
+                }
+              }
+            ]
+          }
+        )
+      end
+
+      context "when user is logged in" do
+        let(:current_user_password) { "N3wCUrr3n+U5er" }
+        let!(:current_user) { create(:user, password: current_user_password) }
+
+        before do
+          create(:post_like, user: current_user, message_id: todays_post5.id)
+          create(:post_like, user: current_user, message_id: earlier_post1.id)
+
+          create(:comment_like, user: current_user, message_id: todays_comment1.id)
+          create(:comment_like, user: current_user, message_id: earlier_comment1.id)
+
+          create(:comment_repost, user: current_user, message_id: todays_comment2.id)
+          create(:comment_repost, user: current_user, message_id: earlier_comment1.id)
+
+          create(:post_repost, user: current_user, message_id: todays_post3.id)
+          create(:post_repost, user: current_user, message_id: earlier_post2.id)
+
+          create(:follow, follower: current_user, followee: todays_comment2.author)
+          create(:follow, follower: current_user, followee: earlier_post1.author)
+          create(:follow, follower: current_user, followee: post_with_irrelevant_comment2.author)
+
+          post("/sign_in", params: {user: {login: current_user.username, password: current_user_password}})
+        end
+
+        it "returns whether or not the logged in user liked or reposted the post/comment or followed the author" do
+          get "/front_page"
+          expect(response.parsed_body).to eq(
+            {
+              "posts" => [
+                {
+                  "id" => todays_post3.id,
+                  "text" => todays_post3.text,
+                  "created_at" => todays_post3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => todays_post3_like_count,
+                  "repost_count" => todays_post3_repost_count + 1,
+                  "comment_count" => todays_post3_comment_count,
+                  "post_date" => todays_post3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => true,
+                  "user_followed" => false,
+                  "rating" => 39 + 3,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => todays_post3.author_id,
+                    "username" => todays_post3.author.username,
+                    "display_name" => todays_post3.author.display_name
+                  }
+                },
+                {
+                  "id" => todays_post4.id,
+                  "text" => todays_post4.text,
+                  "created_at" => todays_post4.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => todays_post4_like_count,
+                  "repost_count" => todays_post4_repost_count,
+                  "comment_count" => todays_post4_comment_count,
+                  "post_date" => todays_post4.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 31,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => todays_post4.author_id,
+                    "username" => todays_post4.author.username,
+                    "display_name" => todays_post4.author.display_name
+                  }
+                },
+                {
+                  "id" => todays_post1.id,
+                  "text" => todays_post1.text,
+                  "created_at" => todays_post1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => todays_post1_like_count,
+                  "repost_count" => todays_post1_repost_count,
+                  "comment_count" => todays_post1_comment_count,
+                  "post_date" => todays_post1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 31,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => todays_post1.author_id,
+                    "username" => todays_post1.author.username,
+                    "display_name" => todays_post1.author.display_name
+                  }
+                },
+                {
+                  "id" => todays_post2.id,
+                  "text" => todays_post2.text,
+                  "created_at" => todays_post2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => todays_post2_like_count,
+                  "repost_count" => todays_post2_repost_count,
+                  "comment_count" => todays_post2_comment_count,
+                  "post_date" => todays_post2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 24,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => todays_post2.author_id,
+                    "username" => todays_post2.author.username,
+                    "display_name" => todays_post2.author.display_name
+                  }
+                },
+                {
+                  "id" => todays_comment1.id,
+                  "text" => todays_comment1.text,
+                  "created_at" => todays_comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "CommentRepost",
+                  "like_count" => 1,
+                  "repost_count" => todays_comment1_repost_count,
+                  "comment_count" => 0,
+                  "post_date" => todays_comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => true,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 18 + 2,
+                  "replying_to" => [todays_comment1.post.author.username],
+                  "author" => {
+                    "id" => todays_comment1.author_id,
+                    "username" => todays_comment1.author.username,
+                    "display_name" => todays_comment1.author.display_name
+                  }
+                },
+                {
+                  "id" => todays_post5.id,
+                  "text" => todays_post5.text,
+                  "created_at" => todays_post5.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => todays_post5_like_count + 1,
+                  "repost_count" => todays_post5_repost_count,
+                  "comment_count" => todays_post5_comment_count,
+                  "post_date" => todays_post5.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => true,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 18 + 2,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => todays_post5.author_id,
+                    "username" => todays_post5.author.username,
+                    "display_name" => todays_post5.author.display_name
+                  }
+                },
+                {
+                  "id" => todays_comment2.id,
+                  "text" => todays_comment2.text,
+                  "created_at" => todays_comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "CommentRepost",
+                  "like_count" => 0,
+                  "repost_count" => todays_comment2_repost_count + 1,
+                  "comment_count" => 0,
+                  "post_date" => todays_comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => true,
+                  "user_followed" => true,
+                  "rating" => 15 + 3,
+                  "replying_to" => [todays_comment2.post.author.username],
+                  "author" => {
+                    "id" => todays_comment2.author_id,
+                    "username" => todays_comment2.author.username,
+                    "display_name" => todays_comment2.author.display_name
+                  }
+                },
+                {
+                  "id" => todays_comment2_post.id,
+                  "text" => todays_comment2_post.text,
+                  "created_at" => todays_comment2_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => 0,
+                  "repost_count" => 0,
+                  "comment_count" => 1,
+                  "post_date" => todays_comment2_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 1,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => todays_comment2_post.author_id,
+                    "username" => todays_comment2_post.author.username,
+                    "display_name" => todays_comment2_post.author.display_name
+                  }
+                },
+                {
+                  "id" => todays_comment1_post.id,
+                  "text" => todays_comment1_post.text,
+                  "created_at" => todays_comment1_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => 0,
+                  "repost_count" => 0,
+                  "comment_count" => 1,
+                  "post_date" => todays_comment1_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 1,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => todays_comment1_post.author_id,
+                    "username" => todays_comment1_post.author.username,
+                    "display_name" => todays_comment1_post.author.display_name
+                  }
+                },
+                {
+                  "id" => earlier_post2.id,
+                  "text" => earlier_post2.text,
+                  "created_at" => earlier_post2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => earlier_post2_like_count,
+                  "repost_count" => earlier_post2_repost_count + 1,
+                  "comment_count" => earlier_post2_comment_count,
+                  "post_date" => earlier_post2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => true,
+                  "user_followed" => false,
+                  "rating" => 34 + 3,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => earlier_post2.author_id,
+                    "username" => earlier_post2.author.username,
+                    "display_name" => earlier_post2.author.display_name
+                  }
+                },
+                {
+                  "id" => earlier_post5.id,
+                  "text" => earlier_post5.text,
+                  "created_at" => earlier_post5.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => earlier_post5_like_count,
+                  "repost_count" => earlier_post5_repost_count,
+                  "comment_count" => earlier_post5_comment_count,
+                  "post_date" => earlier_post5.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 30,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => earlier_post5.author_id,
+                    "username" => earlier_post5.author.username,
+                    "display_name" => earlier_post5.author.display_name
+                  }
+                },
+                {
+                  "id" => earlier_post1.id,
+                  "text" => earlier_post1.text,
+                  "created_at" => earlier_post1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => earlier_post1_like_count + 1,
+                  "repost_count" => earlier_post1_repost_count,
+                  "comment_count" => earlier_post1_comment_count,
+                  "post_date" => earlier_post1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => true,
+                  "user_reposted" => false,
+                  "user_followed" => true,
+                  "rating" => 25 + 2,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => earlier_post1.author_id,
+                    "username" => earlier_post1.author.username,
+                    "display_name" => earlier_post1.author.display_name
+                  }
+                },
+                {
+                  "id" => earlier_comment1.id,
+                  "text" => earlier_comment1.text,
+                  "created_at" => earlier_comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "CommentRepost",
+                  "like_count" => 1,
+                  "repost_count" => earlier_comment1_repost_count + 1,
+                  "comment_count" => 0,
+                  "post_date" => earlier_comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => true,
+                  "user_reposted" => true,
+                  "user_followed" => false,
+                  "rating" => 15 + 2 + 3,
+                  "replying_to" => [earlier_comment1.post.author.username],
+                  "author" => {
+                    "id" => earlier_comment1.author_id,
+                    "username" => earlier_comment1.author.username,
+                    "display_name" => earlier_comment1.author.display_name
+                  }
+                },
+                {
+                  "id" => earlier_post3.id,
+                  "text" => earlier_post3.text,
+                  "created_at" => earlier_post3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => earlier_post3_like_count,
+                  "repost_count" => earlier_post3_repost_count,
+                  "comment_count" => earlier_post3_comment_count,
+                  "post_date" => earlier_post3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 14,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => earlier_post3.author_id,
+                    "username" => earlier_post3.author.username,
+                    "display_name" => earlier_post3.author.display_name
+                  }
+                },
+                {
+                  "id" => earlier_post4.id,
+                  "text" => earlier_post4.text,
+                  "created_at" => earlier_post4.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => earlier_post4_like_count,
+                  "repost_count" => earlier_post4_repost_count,
+                  "comment_count" => earlier_post4_comment_count,
+                  "post_date" => earlier_post4.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 9,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => earlier_post4.author_id,
+                    "username" => earlier_post4.author.username,
+                    "display_name" => earlier_post4.author.display_name
+                  }
+                },
+                {
+                  "id" => post_with_irrelevant_comment3.id,
+                  "text" => post_with_irrelevant_comment3.text,
+                  "created_at" => post_with_irrelevant_comment3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => 0,
+                  "repost_count" => 0,
+                  "comment_count" => post_with_irrelevant_comment3_comment_count,
+                  "post_date" => post_with_irrelevant_comment3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 8,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => post_with_irrelevant_comment3.author_id,
+                    "username" => post_with_irrelevant_comment3.author.username,
+                    "display_name" => post_with_irrelevant_comment3.author.display_name
+                  }
+                },
+                {
+                  "id" => post_with_irrelevant_comment2.id,
+                  "text" => post_with_irrelevant_comment2.text,
+                  "created_at" => post_with_irrelevant_comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => 0,
+                  "repost_count" => 0,
+                  "comment_count" => 1,
+                  "post_date" => post_with_irrelevant_comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => true,
+                  "rating" => 1,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => post_with_irrelevant_comment2.author_id,
+                    "username" => post_with_irrelevant_comment2.author.username,
+                    "display_name" => post_with_irrelevant_comment2.author.display_name
+                  }
+                },
+                {
+                  "id" => post_with_irrelevant_comment1.id,
+                  "text" => post_with_irrelevant_comment1.text,
+                  "created_at" => post_with_irrelevant_comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => 0,
+                  "repost_count" => 0,
+                  "comment_count" => 1,
+                  "post_date" => post_with_irrelevant_comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 1,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => post_with_irrelevant_comment1.author_id,
+                    "username" => post_with_irrelevant_comment1.author.username,
+                    "display_name" => post_with_irrelevant_comment1.author.display_name
+                  }
+                },
+                {
+                  "id" => earlier_comment1_post.id,
+                  "text" => earlier_comment1_post.text,
+                  "created_at" => earlier_comment1_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => 0,
+                  "repost_count" => 0,
+                  "comment_count" => 1,
+                  "post_date" => earlier_comment1_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 1,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => earlier_comment1_post.author_id,
+                    "username" => earlier_comment1_post.author.username,
+                    "display_name" => earlier_comment1_post.author.display_name
+                  }
+                }
+              ]
+            }
+          )
+        end
+      end
+    end
+
+    describe "GET /front_page_following" do
+      describe "when user is logged in" do
+        let(:current_user_password) { "N3wCUrr3n+U5er" }
+        let!(:current_user) { create(:user, password: current_user_password) }
+
+        let(:followee1) { todays_comment2.author }
+        let(:followee2) { earlier_post1.author }
+        let(:followee3) { post_with_irrelevant_comment2.author }
+
+        let(:followee1_reposted_post_comment_count) { 3 }
+        let(:followee1_reposted_post_like_count) { 4 }
+        let(:followee1_reposted_post_repost_count) { 5 }
+
+        let(:followee3_reposted_comment_repost_count) { 2 }
+
+        let(:current_user_reposted_post_comment_count) { 2 }
+        let(:current_user_reposted_post_like_count) { 1 }
+        let(:current_user_reposted_post_repost_count) { 6 }
+
+        let(:current_user_reposted_comment_comment_count) { 4 }
+        let(:current_user_reposted_comment_like_count) { 3 }
+        let(:current_user_reposted_comment_repost_count) { 1 }
+
+        let(:current_user_post_comment_count) { 5 }
+        let(:current_user_post_like_count) { 5 }
+        let(:current_user_post_repost_count) { 2 }
+
+        let!(:followee1_reposted_post) do
+          # Rating 26
+          create(
+            :post,
+            :commented,
+            :liked,
+            :reposted,
+            comment_count: followee1_reposted_post_comment_count,
+            like_count: followee1_reposted_post_like_count,
+            repost_count: followee1_reposted_post_repost_count,
+            created_at: Time.current - 2.days
+          )
+        end
+        let!(:followee1_reposted_post_repost) do
+          create(
+            :post_repost,
+            user: followee1,
+            message_id: followee1_reposted_post.id,
+            created_at: Time.current - 2.days
+          )
+        end
+
+        let!(:followee3_reposted_comment) do
+          # Rating 6
+          create(:comment, :reposted, repost_count: followee3_reposted_comment_repost_count)
+        end
+        let!(:followee3_reposted_comment_repost) do
+          create(:comment_repost, user: followee3, message_id: followee3_reposted_comment.id)
+        end
+
+        let!(:current_user_reposted_post) do
+          # Rating 22
+          create(
+            :post,
+            :commented,
+            :liked,
+            :reposted,
+            comment_count: current_user_reposted_post_comment_count,
+            like_count: current_user_reposted_post_like_count,
+            repost_count: current_user_reposted_post_repost_count
+          )
+        end
+        let!(:current_user_reposted_post_repost) do
+          create(:post_repost, user: current_user, message_id: current_user_reposted_post.id)
+        end
+
+        let!(:current_user_reposted_comment) do
+          # Rating 13
+          create(
+            :comment,
+            :liked,
+            :reposted,
+            :replied,
+            reply_count: current_user_reposted_comment_comment_count,
+            like_count: current_user_reposted_comment_like_count,
+            repost_count: current_user_reposted_comment_repost_count
+          )
+        end
+        let!(:current_user_reposted_comment_repost) do
+          create(:comment_repost, user: current_user, message_id: current_user_reposted_comment.id)
+        end
+
+        let!(:current_user_post) do
+          # Rating 21
+          create(
+            :post,
+            :commented,
+            :liked,
+            :reposted,
+            author_id: current_user.id,
+            comment_count: current_user_post_comment_count,
+            like_count: current_user_post_like_count,
+            repost_count: current_user_post_repost_count
+          )
+        end
+
+        before do
+          create(:follow, follower: current_user, followee: followee1)
+          create(:follow, follower: current_user, followee: followee2)
+          create(:follow, follower: current_user, followee: followee3)
+
+          post("/sign_in", params: {user: {login: current_user.username, password: current_user_password}})
+        end
+
+        it "gets the user's own and followees' posts and reposted comments, sorting them by date and most popular" do
+          get "/front_page_following"
+          expect(response.parsed_body).to eq(
+            {
+              "posts" => [
+                {
+                  "id" => current_user_reposted_post.id,
+                  "text" => current_user_reposted_post.text,
+                  "created_at" => current_user_reposted_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "PostRepost",
+                  "like_count" => current_user_reposted_post_like_count,
+                  "repost_count" => current_user_reposted_post_repost_count + 1,
+                  "comment_count" => current_user_reposted_post_comment_count,
+                  "post_date" => current_user_reposted_post_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => true,
+                  "user_followed" => false,
+                  "rating" => 22 + 3,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => current_user_reposted_post.author_id,
+                    "username" => current_user_reposted_post.author.username,
+                    "display_name" => current_user_reposted_post.author.display_name
+                  }
+                },
+                {
+                  "id" => current_user_post.id,
+                  "text" => current_user_post.text,
+                  "created_at" => current_user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => current_user_post_like_count,
+                  "repost_count" => current_user_post_repost_count,
+                  "comment_count" => current_user_post_comment_count,
+                  "post_date" => current_user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 21,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => current_user.id,
+                    "username" => current_user.username,
+                    "display_name" => current_user.display_name
+                  }
+                },
+                {
+                  "id" => current_user_reposted_comment.id,
+                  "text" => current_user_reposted_comment.text,
+                  "created_at" => current_user_reposted_comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "CommentRepost",
+                  "like_count" => current_user_reposted_comment_like_count,
+                  "repost_count" => current_user_reposted_comment_repost_count + 1,
+                  "comment_count" => current_user_reposted_comment_comment_count,
+                  "post_date" => current_user_reposted_comment_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => true,
+                  "user_followed" => false,
+                  "rating" => 13 + 3,
+                  "replying_to" => [current_user_reposted_comment.post.author.username],
+                  "author" => {
+                    "id" => current_user_reposted_comment.author_id,
+                    "username" => current_user_reposted_comment.author.username,
+                    "display_name" => current_user_reposted_comment.author.display_name
+                  }
+                },
+                {
+                  "id" => followee3_reposted_comment.id,
+                  "text" => followee3_reposted_comment.text,
+                  "created_at" => followee3_reposted_comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "CommentRepost",
+                  "like_count" => 0,
+                  "repost_count" => followee3_reposted_comment_repost_count + 1,
+                  "comment_count" => 0,
+                  "post_date" => followee3_reposted_comment_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 6 + 3,
+                  "replying_to" => [followee3_reposted_comment.post.author.username],
+                  "author" => {
+                    "id" => followee3_reposted_comment.author_id,
+                    "username" => followee3_reposted_comment.author.username,
+                    "display_name" => followee3_reposted_comment.author.display_name
+                  }
+                },
+                {
+                  "id" => followee1_reposted_post.id,
+                  "text" => followee1_reposted_post.text,
+                  "created_at" => followee1_reposted_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "PostRepost",
+                  "like_count" => followee1_reposted_post_like_count,
+                  "repost_count" => followee1_reposted_post_repost_count + 1,
+                  "comment_count" => followee1_reposted_post_comment_count,
+                  "post_date" => followee1_reposted_post_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "rating" => 26 + 3,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => followee1_reposted_post.author_id,
+                    "username" => followee1_reposted_post.author.username,
+                    "display_name" => followee1_reposted_post.author.display_name
+                  }
+                },
+                {
+                  "id" => earlier_post1.id,
+                  "text" => earlier_post1.text,
+                  "created_at" => earlier_post1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => earlier_post1_like_count,
+                  "repost_count" => earlier_post1_repost_count,
+                  "comment_count" => earlier_post1_comment_count,
+                  "post_date" => earlier_post1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => true,
+                  "rating" => 25,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => followee2.id,
+                    "username" => followee2.username,
+                    "display_name" => followee2.display_name
+                  }
+                },
+                {
+                  "id" => post_with_irrelevant_comment2.id,
+                  "text" => post_with_irrelevant_comment2.text,
+                  "created_at" => post_with_irrelevant_comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => 0,
+                  "repost_count" => 0,
+                  "comment_count" => 1,
+                  "post_date" => post_with_irrelevant_comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => true,
+                  "rating" => 1,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => followee3.id,
+                    "username" => followee3.username,
+                    "display_name" => followee3.display_name
+                  }
+                }
+              ]
+            }
+          )
+        end
+      end
+
+      context "when user is not logged in" do
+        it "returns an unauthorized error" do
+          get "/front_page_following"
+          expect(response.parsed_body).to eq "errors" => ["Must be logged in to manage posts."]
+          expect(response).to have_http_status :unauthorized
+        end
+      end
+    end
+    # rubocop:enable Rails/DurationArithmetic, Rails/SkipsModelValidations
+  end
 end
