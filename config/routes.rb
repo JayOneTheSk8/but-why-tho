@@ -28,6 +28,9 @@ Rails.application.routes.draw do
   get "users/:user_id/posts", to: "posts#user_posts", format: "json"
   get "users/:user_id/comments", to: "comments#user_comments", format: "json"
 
+  get "/front_page", to: "posts#front_page", format: "json"
+  get "/front_page_following", to: "posts#front_page_following", format: "json"
+
   get "users/:user_id/linked_posts", to: "posts#user_linked_posts", format: "json"
   get "users/:user_id/linked_comments", to: "comments#user_linked_comments", format: "json"
   get "users/:user_id/likes", to: "likes#user_likes", format: "json"

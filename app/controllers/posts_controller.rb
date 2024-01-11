@@ -1,5 +1,8 @@
 class PostsController < ApplicationController
-  before_action :require_login, only: [:create, :update, :destroy]
+  before_action(
+    :require_login,
+    only: [:create, :update, :destroy, :front_page_following]
+  )
 
   def index
     @posts = Post
@@ -122,6 +125,20 @@ class PostsController < ApplicationController
         status: :not_found
       )
     end
+  end
+
+  def front_page
+    render(
+      json: {posts: Post.popular_posts_and_comments(current_user:)},
+      status: :ok
+    )
+  end
+
+  def front_page_following
+    render(
+      json: {posts: current_user.followed_posts_and_comments},
+      status: :ok
+    )
   end
 
   private
