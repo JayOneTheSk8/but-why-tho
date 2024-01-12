@@ -78,6 +78,17 @@ RSpec.describe "User Requests" do
             .and change { user.reload.updated_at }
             .and not_change { user.reload.username }
             .and not_change { user.reload.session_token }
+
+          expect(response.parsed_body).to eq(
+            {
+              "id" => user.id,
+              "username" => user.username,
+              "display_name" => updated_display_name,
+              "email" => updated_email,
+              "following_count" => 0,
+              "follower_count" => 0
+            }
+          )
         end
 
         it "does not allow password updates" do
@@ -86,6 +97,17 @@ RSpec.describe "User Requests" do
             .and change { user.reload.email }.from(email).to(updated_email)
             .and change { user.reload.updated_at }
             .and not_change { user.reload.password_digest }
+
+          expect(response.parsed_body).to eq(
+            {
+              "id" => user.id,
+              "username" => user.username,
+              "display_name" => updated_display_name,
+              "email" => updated_email,
+              "following_count" => 0,
+              "follower_count" => 0
+            }
+          )
         end
 
         context "when there was a problem updating the user" do
