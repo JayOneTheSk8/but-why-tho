@@ -13,6 +13,7 @@ RSpec.describe "Comment Requests" do
             "text" => comment.text,
             "created_at" => comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "reply_count" => 0,
+            "current_user_following" => false,
             "author" => {
               "id" => comment.author_id,
               "username" => comment.author.username,
@@ -35,6 +36,47 @@ RSpec.describe "Comment Requests" do
         )
     end
 
+    context "when current logged in user follows the comment author" do
+      let!(:current_user) { create(:user) }
+
+      before do
+        create(:follow, follower: current_user, followee: comment.author)
+        post "/sign_in", params: {user: {login: current_user.username, password: current_user.password}}
+      end
+
+      it "notates the user is following them" do
+        get "/comments/#{comment.id}"
+        expect(response.parsed_body)
+          .to eq(
+            {
+              "id" => comment.id,
+              "text" => comment.text,
+              "created_at" => comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+              "reply_count" => 0,
+              "current_user_following" => true,
+              "author" => {
+                "id" => comment.author_id,
+                "username" => comment.author.username,
+                "display_name" => comment.author.display_name
+              },
+              "post" => {
+                "id" => comment.post_id,
+                "text" => comment.post.text,
+                "created_at" => comment.post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "comment_count" => comment.post.comments.count,
+                "author" => {
+                  "id" => comment.post.author_id,
+                  "username" => comment.post.author.username,
+                  "display_name" => comment.post.author.display_name
+                }
+              },
+              "parent" => nil,
+              "replies" => []
+            }
+          )
+      end
+    end
+
     context "when comment has replies" do
       let!(:reply1) { create(:comment, :reply, post: comment.post, comment:) }
       let!(:reply2) { create(:comment, :reply, post: comment.post, comment:) }
@@ -53,6 +95,7 @@ RSpec.describe "Comment Requests" do
               "text" => comment.text,
               "created_at" => comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
               "reply_count" => 2,
+              "current_user_following" => false,
               "author" => {
                 "id" => comment.author_id,
                 "username" => comment.author.username,
@@ -116,6 +159,7 @@ RSpec.describe "Comment Requests" do
               "text" => comment.text,
               "created_at" => comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
               "reply_count" => 0,
+              "current_user_following" => false,
               "author" => {
                 "id" => comment.author_id,
                 "username" => comment.author.username,
@@ -193,6 +237,7 @@ RSpec.describe "Comment Requests" do
             "text" => comment.text,
             "created_at" => comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "reply_count" => 0,
+            "current_user_following" => false,
             "author" => {
               "id" => user.id,
               "username" => user.username,
@@ -213,6 +258,61 @@ RSpec.describe "Comment Requests" do
             "replies" => []
           }
         )
+      end
+
+      context "with a parent" do
+        let!(:parent_comment) { create(:comment, post_id: comment_post.id) }
+
+        it "creates a comment with a parent" do
+          expect { post "/comments", params: comment_params.deep_merge(comment: {parent_id: parent_comment.id}) }
+            .to change { Comment.count }.by(1)
+
+          comment = Comment.last
+          expect(comment).to have_attributes(
+            text: comment_params[:comment][:text],
+            author_id: user.id,
+            post_id: comment_post.id,
+            parent_id: parent_comment.id
+          )
+
+          expect(response.parsed_body).to eq(
+            {
+              "id" => comment.id,
+              "text" => comment.text,
+              "created_at" => comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+              "reply_count" => 0,
+              "current_user_following" => false,
+              "author" => {
+                "id" => user.id,
+                "username" => user.username,
+                "display_name" => user.display_name
+              },
+              "post" => {
+                "id" => comment.post_id,
+                "text" => comment.post.text,
+                "created_at" => comment.post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "comment_count" => comment.post.comments.count,
+                "author" => {
+                  "id" => comment.post.author_id,
+                  "username" => comment.post.author.username,
+                  "display_name" => comment.post.author.display_name
+                }
+              },
+              "parent" => {
+                "id" => parent_comment.id,
+                "text" => parent_comment.text,
+                "created_at" => parent_comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "reply_count" => 1,
+                "author" => {
+                  "id" => parent_comment.author_id,
+                  "username" => parent_comment.author.username,
+                  "display_name" => parent_comment.author.display_name
+                }
+              },
+              "replies" => []
+            }
+          )
+        end
       end
 
       context "with an invalid comment" do
@@ -265,6 +365,7 @@ RSpec.describe "Comment Requests" do
             "text" => comment_params[:comment][:text],
             "created_at" => comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "reply_count" => 0,
+            "current_user_following" => false,
             "author" => {
               "id" => user.id,
               "username" => user.username,
@@ -311,6 +412,7 @@ RSpec.describe "Comment Requests" do
                 "text" => comment_params[:comment][:text],
                 "created_at" => comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "reply_count" => 2,
+                "current_user_following" => false,
                 "author" => {
                   "id" => user.id,
                   "username" => user.username,
@@ -442,6 +544,7 @@ RSpec.describe "Comment Requests" do
             "text" => comment.text,
             "created_at" => comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "reply_count" => 0,
+            "current_user_following" => false,
             "author" => {
               "id" => user.id,
               "username" => user.username,
@@ -494,6 +597,7 @@ RSpec.describe "Comment Requests" do
                 "text" => comment.text,
                 "created_at" => comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "reply_count" => 0,
+                "current_user_following" => false,
                 "author" => {
                   "id" => user.id,
                   "username" => user.username,

@@ -57,49 +57,80 @@ RSpec.describe "Post Requests" do
   end
 
   describe "GET /posts/:id" do
-    let!(:post) { create(:post) }
+    let!(:po) { create(:post) }
 
     it "retrieves the post at the given ID" do
-      get "/posts/#{post.id}"
+      get "/posts/#{po.id}"
       expect(response.parsed_body)
         .to eq(
           {
-            "id" => post.id,
-            "text" => post.text,
-            "created_at" => post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+            "id" => po.id,
+            "text" => po.text,
+            "created_at" => po.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "comment_count" => 0,
+            "current_user_following" => false,
             "author" => {
-              "id" => post.author_id,
-              "username" => post.author.username,
-              "display_name" => post.author.display_name
+              "id" => po.author_id,
+              "username" => po.author.username,
+              "display_name" => po.author.display_name
             },
             "comments" => []
           }
         )
     end
 
-    context "with comments" do
-      let!(:comment1) { create(:comment, post:) }
-      let!(:comment2) { create(:comment, post:) }
+    context "when the current user is following the post author" do
+      let!(:current_user) { create(:user) }
 
       before do
-        create(:comment, :reply, post:, comment: comment1)
-        create(:comment, :reply, post:, comment: comment1)
+        create(:follow, follower: current_user, followee: po.author)
+        post("/sign_in", params: {user: {login: current_user.username, password: current_user.password}})
       end
 
-      it "includes the comments for the post" do
-        get "/posts/#{post.id}"
+      it "notates the user is following them" do
+        get "/posts/#{po.id}"
         expect(response.parsed_body)
           .to eq(
             {
-              "id" => post.id,
-              "text" => post.text,
-              "comment_count" => 2,
-              "created_at" => post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+              "id" => po.id,
+              "text" => po.text,
+              "created_at" => po.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+              "comment_count" => 0,
+              "current_user_following" => true,
               "author" => {
-                "id" => post.author_id,
-                "username" => post.author.username,
-                "display_name" => post.author.display_name
+                "id" => po.author_id,
+                "username" => po.author.username,
+                "display_name" => po.author.display_name
+              },
+              "comments" => []
+            }
+          )
+      end
+    end
+
+    context "with comments" do
+      let!(:comment1) { create(:comment, post: po) }
+      let!(:comment2) { create(:comment, post: po) }
+
+      before do
+        create(:comment, :reply, post: po, comment: comment1)
+        create(:comment, :reply, post: po, comment: comment1)
+      end
+
+      it "includes the comments for the post" do
+        get "/posts/#{po.id}"
+        expect(response.parsed_body)
+          .to eq(
+            {
+              "id" => po.id,
+              "text" => po.text,
+              "comment_count" => 2,
+              "current_user_following" => false,
+              "created_at" => po.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+              "author" => {
+                "id" => po.author_id,
+                "username" => po.author.username,
+                "display_name" => po.author.display_name
               },
               "comments" => [
                 {
@@ -169,6 +200,7 @@ RSpec.describe "Post Requests" do
             "id" => post.id,
             "text" => post.text,
             "comment_count" => 0,
+            "current_user_following" => false,
             "created_at" => post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => post.author_id,
@@ -229,6 +261,7 @@ RSpec.describe "Post Requests" do
             "id" => user_post.id,
             "text" => post_params[:post][:text],
             "comment_count" => 0,
+            "current_user_following" => false,
             "created_at" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => user_post.author_id,
@@ -260,6 +293,7 @@ RSpec.describe "Post Requests" do
                 "id" => user_post.id,
                 "text" => post_params[:post][:text],
                 "comment_count" => 2,
+                "current_user_following" => false,
                 "created_at" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "author" => {
                   "id" => user_post.author_id,
@@ -368,6 +402,7 @@ RSpec.describe "Post Requests" do
             "id" => user_post.id,
             "text" => user_post.text,
             "comment_count" => 0,
+            "current_user_following" => false,
             "created_at" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "author" => {
               "id" => user_post.author_id,
@@ -398,6 +433,7 @@ RSpec.describe "Post Requests" do
                 "id" => user_post.id,
                 "text" => user_post.text,
                 "comment_count" => 0,
+                "current_user_following" => false,
                 "created_at" => user_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "author" => {
                   "id" => user_post.author_id,

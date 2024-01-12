@@ -1,5 +1,11 @@
 json.partial! "comments/comment", comment: @comment
 
+json.current_user_following(
+  logged_in? && Follow.find_by(
+    follower_id: current_user.id, followee_id: @comment.author_id
+  ).present?
+)
+
 json.post do
   json.partial! "posts/post", post: @comment.post
 end
