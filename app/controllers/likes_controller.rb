@@ -46,7 +46,13 @@ class LikesController < ApplicationController
 
     if @user.present?
       render(
-        json: {likes: @user.likes(current_user:)},
+        json: {
+          user: {
+            username: @user.username,
+            display_name: @user.display_name
+          },
+          likes: @user.likes(current_user:)
+        },
         status: :ok
       )
     else

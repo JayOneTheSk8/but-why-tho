@@ -133,7 +133,13 @@ class CommentsController < ApplicationController
 
     if @user.present?
       render(
-        json: {comments: @user.linked_comments(current_user:)},
+        json: {
+          user: {
+            username: @user.username,
+            display_name: @user.display_name
+          },
+          comments: @user.linked_comments(current_user:)
+        },
         status: :ok
       )
     else

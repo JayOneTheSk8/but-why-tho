@@ -810,6 +810,10 @@ RSpec.describe "Comment Requests" do
         get "/users/#{user.id}/linked_comments"
         expect(response.parsed_body).to eq(
           {
+            "user" => {
+              "username" => user.username,
+              "display_name" => user.display_name
+            },
             "comments" => [
               {
                 "id" => reposted_comment.id,
@@ -913,6 +917,10 @@ RSpec.describe "Comment Requests" do
           get "/users/#{user.id}/linked_comments"
           expect(response.parsed_body).to eq(
             {
+              "user" => {
+                "username" => user.username,
+                "display_name" => user.display_name
+              },
               "comments" => [
                 {
                   "id" => reposted_comment.id,

@@ -116,7 +116,13 @@ class PostsController < ApplicationController
 
     if @user.present?
       render(
-        json: {posts: @user.linked_posts(current_user:)},
+        json: {
+          user: {
+            username: @user.username,
+            display_name: @user.display_name
+          },
+          posts: @user.linked_posts(current_user:)
+        },
         status: :ok
       )
     else

@@ -336,6 +336,10 @@ RSpec.describe "Like Requests" do
         get "/users/#{user.id}/likes"
         expect(response.parsed_body).to eq(
           {
+            "user" => {
+              "username" => user.username,
+              "display_name" => user.display_name
+            },
             "likes" => [
               {
                 "id" => comment2.id,
@@ -456,6 +460,10 @@ RSpec.describe "Like Requests" do
           get "/users/#{user.id}/likes"
           expect(response.parsed_body).to eq(
             {
+              "user" => {
+                "username" => user.username,
+                "display_name" => user.display_name
+              },
               "likes" => [
                 {
                   "id" => comment2.id,

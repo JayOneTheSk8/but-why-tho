@@ -645,6 +645,10 @@ RSpec.describe "Post Requests" do
         get "/users/#{user.id}/linked_posts"
         expect(response.parsed_body).to eq(
           {
+            "user" => {
+              "username" => user.username,
+              "display_name" => user.display_name
+            },
             "posts" => [
               {
                 "id" => reposted_reply.id,
@@ -746,6 +750,10 @@ RSpec.describe "Post Requests" do
           get "/users/#{user.id}/linked_posts"
           expect(response.parsed_body).to eq(
             {
+              "user" => {
+                "username" => user.username,
+                "display_name" => user.display_name
+              },
               "posts" => [
                 {
                   "id" => reposted_reply.id,
