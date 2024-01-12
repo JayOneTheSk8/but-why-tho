@@ -122,15 +122,6 @@ class FollowsController < ApplicationController
 
   private
 
-  def require_login
-    return if logged_in?
-
-    render(
-      json: {errors: ["Must be logged in to manage follows."]},
-      status: :unauthorized
-    )
-  end
-
   def follow_params
     params.require(:follow).permit(:followee_id)
   end

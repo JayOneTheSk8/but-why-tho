@@ -94,15 +94,6 @@ class LikesController < ApplicationController
     end
   end
 
-  def require_login
-    return if logged_in?
-
-    render(
-      json: {errors: ["Must be logged in to manage likes."]},
-      status: :unauthorized
-    )
-  end
-
   def like_params
     params.require(:like).permit(:message_id)
   end

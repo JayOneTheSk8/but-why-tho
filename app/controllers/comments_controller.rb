@@ -152,15 +152,6 @@ class CommentsController < ApplicationController
 
   private
 
-  def require_login
-    return if logged_in?
-
-    render(
-      json: {errors: ["Must be logged in to manage comments."]},
-      status: :unauthorized
-    )
-  end
-
   def create_comment_params
     params.require(:comment).permit(:text, :post_id, :parent_id)
   end

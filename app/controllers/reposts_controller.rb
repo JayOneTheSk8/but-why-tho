@@ -72,15 +72,6 @@ class RepostsController < ApplicationController
     end
   end
 
-  def require_login
-    return if logged_in?
-
-    render(
-      json: {errors: ["Must be logged in to manage reposts."]},
-      status: :unauthorized
-    )
-  end
-
   def repost_params
     params.require(:repost).permit(:message_id)
   end

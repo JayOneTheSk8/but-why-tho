@@ -149,15 +149,6 @@ class PostsController < ApplicationController
 
   private
 
-  def require_login
-    return if logged_in?
-
-    render(
-      json: {errors: ["Must be logged in to manage posts."]},
-      status: :unauthorized
-    )
-  end
-
   def post_params
     params.require(:post).permit(:text)
   end

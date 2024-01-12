@@ -17,4 +17,19 @@ class ApplicationController < ActionController::API
     current_user&.reset_session_token!
     session[:session_token] = nil
   end
+
+  private
+
+  def require_login
+    return if logged_in?
+
+    render(
+      json: {
+        errors: [
+          "Must be logged in to manage #{self.class.name.gsub('Controller', '').downcase}."
+        ]
+      },
+      status: :unauthorized
+    )
+  end
 end
