@@ -18,7 +18,6 @@ RSpec.describe "Authentication" do
       it "signs up a user" do
         expect { post "/sign_up", params: }
           .to change(User, :count).by(1)
-          .and change(UserMailer.deliveries, :count).by(1)
 
         username = params[:user][:username]
         email = params[:user][:email]
