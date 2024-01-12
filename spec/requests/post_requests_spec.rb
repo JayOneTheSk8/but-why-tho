@@ -972,9 +972,6 @@ RSpec.describe "Post Requests" do
         repost_count: earlier_post1_repost_count,
         created_at: Time.current - 2.days
       )
-      # ) do |post|
-      #   post.update_column(:created_at, Time.current - 2.days)
-      # end
     end
     let!(:earlier_post2) do
       # Rating 34
@@ -988,9 +985,6 @@ RSpec.describe "Post Requests" do
         repost_count: earlier_post2_repost_count,
         created_at: Time.current - 2.days
       )
-      # ) do |post|
-      #   post.update_column(:created_at, Time.current - 2.days)
-      # end
     end
     let!(:earlier_post3) do
       # Rating 14
@@ -1004,9 +998,6 @@ RSpec.describe "Post Requests" do
         repost_count: earlier_post3_repost_count,
         created_at: Time.current - 2.days
       )
-      # ) do |post|
-      #   post.update_column(:created_at, Time.current - 2.days)
-      # end
     end
     let!(:earlier_post4) do
       # Rating 9
@@ -1020,9 +1011,6 @@ RSpec.describe "Post Requests" do
         repost_count: earlier_post4_repost_count,
         created_at: Time.current - 2.days
       )
-      # ) do |post|
-      #   post.update_column(:created_at, Time.current - 2.days)
-      # end
     end
     let!(:earlier_post5) do
       # Rating 30
@@ -1036,9 +1024,6 @@ RSpec.describe "Post Requests" do
         repost_count: earlier_post5_repost_count,
         created_at: Time.current - 2.days
       )
-      # ) do |post|
-      #   post.update_column(:created_at, Time.current - 2.days)
-      # end
     end
 
     let!(:earlier_comment1) do
