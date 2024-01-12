@@ -57,4 +57,61 @@ RSpec.describe "User Requests" do
       end
     end
   end
+
+  describe "PUT /users/:id" do
+    let!(:user) { create(:user) }
+    let(:display_name) { user.display_name }
+    let(:email) { user.email }
+
+    let(:updated_display_name) { "New Name" }
+    let(:updated_email) { "newemail@gmail.com" }
+    let(:params) { {user: {display_name: updated_display_name, email: updated_email}} }
+
+    context "when logged in" do
+      before { post "/sign_in", params: {user: {login: user.username, password: user.password}} }
+
+      context "when the current user is the user being updated" do
+        it "updates the user with the passed params" do
+          expect { put("/users/#{user.id}", params:) }
+            .to change { user.reload.display_name }.from(display_name).to(updated_display_name)
+            .and change { user.reload.email }.from(email).to(updated_email)
+            .and change { user.reload.updated_at }
+            .and not_change { user.reload.username }
+            .and not_change { user.reload.session_token }
+        end
+
+        it "does not allow password updates" do
+          expect { put "/users/#{user.id}", params: params.deep_merge(user: {password: "newpass"}) }
+            .to change { user.reload.display_name }.from(display_name).to(updated_display_name)
+            .and change { user.reload.email }.from(email).to(updated_email)
+            .and change { user.reload.updated_at }
+            .and not_change { user.reload.password_digest }
+        end
+
+        context "when there was a problem updating the user" do
+          it "returns an unprocessable entity error" do
+            put "/users/#{user.id}", params: params.deep_merge(user: {display_name: ""})
+            expect(response.parsed_body).to eq "errors" => ["Display name can't be blank"]
+            expect(response).to have_http_status :unprocessable_entity
+          end
+        end
+      end
+
+      context "when the current user is not the user being updated" do
+        it "returns an unauthorized error" do
+          put("/users/0", params:)
+          expect(response.parsed_body).to eq "errors" => ["This account is inaccessible"]
+          expect(response).to have_http_status :unauthorized
+        end
+      end
+    end
+
+    context "when not logged in" do
+      it "returns an unauthorized error" do
+        put("/users/#{user.id}", params:)
+        expect(response.parsed_body).to eq "errors" => ["Must be logged in to manage users."]
+        expect(response).to have_http_status :unauthorized
+      end
+    end
+  end
 end
