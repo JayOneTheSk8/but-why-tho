@@ -1,7 +1,9 @@
 Rails.application.routes.draw do
   root "static_pages#home"
+
   post "sign_up", to: "users#create", format: "json"
   get "users/:username", to: "users#show", format: "json"
+  put "users/:id", to: "users#update", format: "json"
 
   post "sign_in", to: "sessions#create", format: "json"
   get "sign_out", to: "sessions#destroy", format: "json"
