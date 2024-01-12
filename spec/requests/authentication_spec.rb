@@ -205,4 +205,32 @@ RSpec.describe "Authentication" do
       end
     end
   end
+
+  describe "GET /sessions" do
+    let!(:user) { create(:user) }
+
+    context "when a user is logged in" do
+      before { post "/sign_in", params: {user: {login: user.username, password: user.password}} }
+
+      it "returns the user's session data" do
+        get "/sessions"
+        expect(response.parsed_body).to eq(
+          {
+            "id" => user.id,
+            "username" => user.username,
+            "display_name" => user.display_name,
+            "email" => user.email
+          }
+        )
+      end
+    end
+
+    context "when a user is not logged in" do
+      it "returns a not found error" do
+        get "/sessions"
+        expect(response.parsed_body).to eq "errors" => ["No session present"]
+        expect(response).to have_http_status :not_found
+      end
+    end
+  end
 end

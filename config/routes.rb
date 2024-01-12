@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   post "sign_in", to: "sessions#create", format: "json"
   get "sign_out", to: "sessions#destroy", format: "json"
+  get "sessions", to: "sessions#show", format: "json"
 
   resources :email_confirmations, only: [:edit, :create], param: :confirmation_token
   resources :posts, format: "json"
