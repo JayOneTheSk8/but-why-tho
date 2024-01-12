@@ -1389,7 +1389,7 @@ class User < ApplicationRecord
             posts.id,
             post_authors.id,
             current_user_likes.like_id
-        ), merged as (
+        ), full_collection as (
           SELECT * FROM followee_reposted_posts
           UNION ALL
           SELECT * FROM followee_reposted_comments
@@ -1401,15 +1401,22 @@ class User < ApplicationRecord
           SELECT * FROM user_reposted_comments
           UNION ALL
           SELECT * FROM user_posts
+        ), partitioned as (
+          SELECT
+            *,
+            ROW_NUMBER() OVER (PARTITION BY post_type, id ORDER BY post_date DESC) as row_num
+          FROM full_collection
+        ), final_collection as (
+          SELECT * FROM partitioned WHERE row_num = 1
         ), like_counts as (
           SELECT
             COUNT(likes.id) as like_count,
             likes.message_id as message_id,
             likes.type as message_type
           FROM likes
-          INNER JOIN merged
-            ON likes.type = merged.like_type
-            AND likes.message_id = merged.id
+          INNER JOIN final_collection
+            ON likes.type = final_collection.like_type
+            AND likes.message_id = final_collection.id
           GROUP BY
             likes.type, likes.message_id
         ), repost_counts as (
@@ -1418,28 +1425,28 @@ class User < ApplicationRecord
             reposts.message_id as message_id,
             reposts.type as message_type
           FROM reposts
-          INNER JOIN merged
-            ON reposts.type = merged.repost_type
-            AND reposts.message_id = merged.id
+          INNER JOIN final_collection
+            ON reposts.type = final_collection.repost_type
+            AND reposts.message_id = final_collection.id
           GROUP BY
             reposts.type, reposts.message_id
         ), all_posts_and_comments as (
           SELECT
-            merged.*,
+            final_collection.*,
             COALESCE(repost_counts.repost_count, 0) as repost_count,
             COALESCE(like_counts.like_count, 0) as like_count,
             (
               (COALESCE(repost_counts.repost_count, 0) * 3) +
               (COALESCE(like_counts.like_count, 0) * 2) +
-              (merged.comment_count * 1)
+              (final_collection.comment_count * 1)
             ) as post_rating
-          FROM merged
+          FROM final_collection
           LEFT OUTER JOIN like_counts
-            ON like_counts.message_type = merged.like_type
-            AND like_counts.message_id = merged.id
+            ON like_counts.message_type = final_collection.like_type
+            AND like_counts.message_id = final_collection.id
           LEFT OUTER JOIN repost_counts
-            ON repost_counts.message_type = merged.repost_type
-            AND repost_counts.message_id = merged.id
+            ON repost_counts.message_type = final_collection.repost_type
+            AND repost_counts.message_id = final_collection.id
         )
         SELECT apac.*
         FROM all_posts_and_comments apac

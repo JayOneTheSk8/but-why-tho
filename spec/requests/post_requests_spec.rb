@@ -1944,10 +1944,9 @@ RSpec.describe "Post Requests" do
             reply_count: current_user_reposted_comment_comment_count,
             like_count: current_user_reposted_comment_like_count,
             repost_count: current_user_reposted_comment_repost_count
-          )
-        end
-        let!(:current_user_reposted_comment_repost) do
-          create(:comment_repost, user: current_user, message_id: current_user_reposted_comment.id)
+          ) do |comment|
+            create(:comment_repost, user: current_user, message_id: comment.id)
+          end
         end
 
         let!(:current_user_post) do
@@ -1962,6 +1961,10 @@ RSpec.describe "Post Requests" do
             like_count: current_user_post_like_count,
             repost_count: current_user_post_repost_count
           )
+        end
+
+        let!(:followee1_repost_of_current_user_reposted_comment) do
+          create(:comment_repost, user: followee1, message_id: current_user_reposted_comment.id)
         end
 
         before do
@@ -2023,13 +2026,15 @@ RSpec.describe "Post Requests" do
                   "created_at" => current_user_reposted_comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                   "post_type" => "CommentRepost",
                   "like_count" => current_user_reposted_comment_like_count,
-                  "repost_count" => current_user_reposted_comment_repost_count + 1,
+                  "repost_count" => current_user_reposted_comment_repost_count + 1 + 1,
                   "comment_count" => current_user_reposted_comment_comment_count,
-                  "post_date" => current_user_reposted_comment_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_date" => followee1_repost_of_current_user_reposted_comment
+                                 .created_at
+                                 .strftime("%Y-%m-%dT%T.%LZ"),
                   "user_liked" => false,
                   "user_reposted" => true,
                   "user_followed" => false,
-                  "rating" => 13 + 3,
+                  "rating" => 13 + 3 + 3,
                   "replying_to" => [current_user_reposted_comment.post.author.username],
                   "author" => {
                     "id" => current_user_reposted_comment.author_id,
