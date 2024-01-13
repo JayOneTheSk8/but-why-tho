@@ -37,7 +37,7 @@ API Specs
 Creates a new `User` and signs them in.
 
 #### Request
-```ruby
+```yaml
 {
   "user": {
     "username": <string> 
@@ -50,7 +50,7 @@ Creates a new `User` and signs them in.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "id": <bigint>
   "username": <string>
@@ -63,7 +63,7 @@ Creates a new `User` and signs them in.
 Signs a `User` in.
 
 #### Request
-```ruby
+```yaml
 {
   "user": {
     "login": <string> # Username or email or user
@@ -73,7 +73,7 @@ Signs a `User` in.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "id": <bigint>
   "username": <string>
@@ -93,7 +93,7 @@ Signs the `User` out.
 Returns the current logged in `User`.
 
 #### Response
-```ruby
+```yaml
 {
   "id": <bigint>
   "username": <string>
@@ -108,7 +108,7 @@ Returns the current logged in `User`.
 Get the data of the `User`.
 
 #### Response
-```ruby
+```yaml
 {
   "id": <bigint>
   "username": <string>
@@ -122,7 +122,7 @@ Get the data of the `User`.
 ### PUT /users/:id
 Edits the `User`.
 
-```ruby
+```yaml
 {
   "id": <bigint>
   "username": <string>
@@ -139,7 +139,7 @@ Edits the `User`.
 Gets all `Post`s by lastest creation date.
 
 #### Response
-```ruby
+```yaml
 [
   {
     "id": <bigint>
@@ -175,7 +175,7 @@ Gets all `Post`s by lastest creation date.
 Gets the data of the `Post`.
 
 #### Response
-```ruby
+```yaml
 {
   "id": <bigint>
   "text": <string>
@@ -208,7 +208,7 @@ Gets the data of the `Post`.
 Creates a new `Post`.
 
 #### Request
-```ruby
+```yaml
 {
   "post": {
     "text": <string>
@@ -217,7 +217,7 @@ Creates a new `Post`.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "id": <bigint>
   "text": <string>
@@ -250,7 +250,7 @@ Creates a new `Post`.
 Updates a `Post`'s text.
 
 #### Request
-```ruby
+```yaml
 {
   "post": {
     "text": <string>
@@ -259,7 +259,7 @@ Updates a `Post`'s text.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "id": <bigint>
   "text": <string>
@@ -292,7 +292,7 @@ Updates a `Post`'s text.
 Deletes a `Post` and its associated comments
 
 #### Response
-```ruby
+```yaml
 {
   "id": <bigint>
   "text": <string>
@@ -312,7 +312,7 @@ Deletes a `Post` and its associated comments
 Gets the `User`'s created `Post`s.
 
 #### Response
-```ruby
+```yaml
 [
   {
     "id": <bigint>
@@ -348,7 +348,7 @@ Gets the `User`'s created `Post`s.
 Gets all `User`'s created `Post`s and reposted `Post`s and `Comment`s
 
 #### Response
-```ruby
+```yaml
 {
   "user": {
     "username": <string>
@@ -384,7 +384,7 @@ Gets all `User`'s created `Post`s and reposted `Post`s and `Comment`s
 Gets the most popular `Post`s and reposted `Comment`s by date and popularity.
 
 #### Response
-```ruby
+```yaml
 {
   "posts": [
     {
@@ -416,7 +416,7 @@ Gets the most popular `Post`s and reposted `Comment`s by date and popularity.
 Gets the most popular posts and reposted comments by date and popularity; filtered by the current `User`'s following list. Includes the `User`'s posts and reposts as well.
 
 #### Response
-```ruby
+```yaml
 {
   "posts": [
     {
@@ -451,7 +451,7 @@ Gets the most popular posts and reposted comments by date and popularity; filter
 Gets the data of a `Comment`.
 
 #### Response
-```ruby
+```yaml
 {
   "id": <bigint>
   "text": <string>
@@ -507,7 +507,7 @@ Gets the data of a `Comment`.
 Creates a new `Comment`.
 
 #### Request
-```ruby
+```yaml
 {
   "comment": {
     "text": <string>
@@ -518,7 +518,7 @@ Creates a new `Comment`.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "id": <bigint>
   "text": <string>
@@ -574,7 +574,7 @@ Creates a new `Comment`.
 Updates `Comment`'s text.
 
 #### Request
-```ruby
+```yaml
 {
   "comment": {
     "text": <string>
@@ -583,7 +583,7 @@ Updates `Comment`'s text.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "id": <bigint>
   "text": <string>
@@ -639,7 +639,7 @@ Updates `Comment`'s text.
 Deletes a `Comment`.
 
 #### Response
-```ruby
+```yaml
 {
   "id": <bigint>
   "text": <string>
@@ -695,7 +695,7 @@ Deletes a `Comment`.
 Gets the `User`'s created comments.
 
 #### Response
-```ruby
+```yaml
 [
   {
     "id": <bigint>
@@ -738,7 +738,7 @@ Gets the `User`'s created comments.
 Gets the `User`'s created and reposted `Comment`s. 
 
 #### Response
-```ruby
+```yaml
 {
   "user": {
     "username": <string>
@@ -776,7 +776,7 @@ Gets the `User`'s created and reposted `Comment`s.
 Creates a new `CommentLike`.
 
 #### Request
-```ruby
+```yaml
 {
   "like": {
     "message_id": <bigint>
@@ -785,7 +785,7 @@ Creates a new `CommentLike`.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "type": "CommentLike"
   "comment_id": <bigint>
@@ -797,7 +797,7 @@ Creates a new `CommentLike`.
 Deletes a `CommentLike`.
 
 #### Request
-```ruby
+```yaml
 {
   "like": {
     "message_id": <bigint>
@@ -806,7 +806,7 @@ Deletes a `CommentLike`.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "type": "CommentLike"
   "comment_id": <bigint>
@@ -818,7 +818,7 @@ Deletes a `CommentLike`.
 Creates a new `PostLike`.
 
 #### Request
-```ruby
+```yaml
 {
   "like": {
     "message_id": <bigint>
@@ -827,7 +827,7 @@ Creates a new `PostLike`.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "type": "PostLike"
   "post_id": <bigint>
@@ -839,7 +839,7 @@ Creates a new `PostLike`.
 Deletes a `PostLike`.
 
 #### Request
-```ruby
+```yaml
 {
   "like": {
     "message_id": <bigint>
@@ -848,7 +848,7 @@ Deletes a `PostLike`.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "type": "PostLike"
   "post_id": <bigint>
@@ -860,7 +860,7 @@ Deletes a `PostLike`.
 Gets the `Post`s and `Comment`s the `User` liked in order of `Like`.
 
 #### Response
-```ruby
+```yaml
 {
   "user": {
     "username": <string>
@@ -898,7 +898,7 @@ Gets the `Post`s and `Comment`s the `User` liked in order of `Like`.
 Creates a `CommentRepost`.
 
 #### Request
-```ruby
+```yaml
 {
   "repost": {
     "message_id": <bigint>
@@ -907,7 +907,7 @@ Creates a `CommentRepost`.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "type": "CommentRepost"
   "comment_id": <bigint>
@@ -919,7 +919,7 @@ Creates a `CommentRepost`.
 Deletes a `CommentRepost`.
 
 #### Request
-```ruby
+```yaml
 {
   "repost": {
     "message_id": <bigint>
@@ -928,7 +928,7 @@ Deletes a `CommentRepost`.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "type": "CommentRepost"
   "comment_id": <bigint>
@@ -940,7 +940,7 @@ Deletes a `CommentRepost`.
 Creates a `PostRepost`.
 
 #### Request
-```ruby
+```yaml
 {
   "repost": {
     "message_id": <bigint>
@@ -949,7 +949,7 @@ Creates a `PostRepost`.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "type": "PostRepost"
   "post_id": <bigint>
@@ -961,7 +961,7 @@ Creates a `PostRepost`.
 Deletes a `PostRepost`.
 
 #### Request
-```ruby
+```yaml
 {
   "repost": {
     "message_id": <bigint>
@@ -970,7 +970,7 @@ Deletes a `PostRepost`.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "type": "PostRepost"
   "post_id": <bigint>
@@ -984,7 +984,7 @@ Deletes a `PostRepost`.
 Creates a `Follow`.
 
 #### Request
-```ruby
+```yaml
 {
   "follow": {
     "followee_id": <bigint>
@@ -993,7 +993,7 @@ Creates a `Follow`.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "follower_id": <bigint>
   "followee_id": <bigint>
@@ -1004,7 +1004,7 @@ Creates a `Follow`.
 Deletes a `Follow`.
 
 #### Request
-```ruby
+```yaml
 {
   "follow": {
     "followee_id": <bigint>
@@ -1013,7 +1013,7 @@ Deletes a `Follow`.
 ```
 
 #### Response
-```ruby
+```yaml
 {
   "follower_id": <bigint>
   "followee_id": <bigint>
@@ -1024,7 +1024,7 @@ Deletes a `Follow`.
 Gets the `User`s the `User` is following.
 
 #### Response
-```ruby
+```yaml
 {
   "id": <bigint>
   "display_name": <string>
@@ -1046,7 +1046,7 @@ Gets the `User`s the `User` is following.
 Gets the `User`s that follow the `User`.
 
 #### Response
-```ruby
+```yaml
 {
   "id": <bigint>
   "display_name": <string>
