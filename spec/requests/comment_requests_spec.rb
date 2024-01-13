@@ -24,6 +24,7 @@ RSpec.describe "Comment Requests" do
               "text" => comment.post.text,
               "created_at" => comment.post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
               "comment_count" => comment.post.comments.count,
+              "current_user_following" => false,
               "author" => {
                 "id" => comment.post.author_id,
                 "username" => comment.post.author.username,
@@ -64,6 +65,49 @@ RSpec.describe "Comment Requests" do
                 "text" => comment.post.text,
                 "created_at" => comment.post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "comment_count" => comment.post.comments.count,
+                "current_user_following" => false,
+                "author" => {
+                  "id" => comment.post.author_id,
+                  "username" => comment.post.author.username,
+                  "display_name" => comment.post.author.display_name
+                }
+              },
+              "parent" => nil,
+              "replies" => []
+            }
+          )
+      end
+    end
+
+    context "when current logged in user follows the post author" do
+      let!(:current_user) { create(:user) }
+
+      before do
+        create(:follow, follower: current_user, followee: comment.post.author)
+        post "/sign_in", params: {user: {login: current_user.username, password: current_user.password}}
+      end
+
+      it "notates the user is following them" do
+        get "/comments/#{comment.id}"
+        expect(response.parsed_body)
+          .to eq(
+            {
+              "id" => comment.id,
+              "text" => comment.text,
+              "created_at" => comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+              "reply_count" => 0,
+              "current_user_following" => false,
+              "author" => {
+                "id" => comment.author_id,
+                "username" => comment.author.username,
+                "display_name" => comment.author.display_name
+              },
+              "post" => {
+                "id" => comment.post_id,
+                "text" => comment.post.text,
+                "created_at" => comment.post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "comment_count" => comment.post.comments.count,
+                "current_user_following" => true,
                 "author" => {
                   "id" => comment.post.author_id,
                   "username" => comment.post.author.username,
@@ -106,6 +150,7 @@ RSpec.describe "Comment Requests" do
                 "text" => comment.post.text,
                 "created_at" => comment.post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "comment_count" => comment.post.comments.count,
+                "current_user_following" => false,
                 "author" => {
                   "id" => comment.post.author_id,
                   "username" => comment.post.author.username,
@@ -170,6 +215,7 @@ RSpec.describe "Comment Requests" do
                 "text" => comment.post.text,
                 "created_at" => comment.post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "comment_count" => comment.post.comments.count,
+                "current_user_following" => false,
                 "author" => {
                   "id" => comment.post.author_id,
                   "username" => comment.post.author.username,
@@ -248,6 +294,7 @@ RSpec.describe "Comment Requests" do
               "text" => comment.post.text,
               "created_at" => comment.post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
               "comment_count" => comment.post.comments.count,
+              "current_user_following" => false,
               "author" => {
                 "id" => comment.post.author_id,
                 "username" => comment.post.author.username,
@@ -292,6 +339,7 @@ RSpec.describe "Comment Requests" do
                 "text" => comment.post.text,
                 "created_at" => comment.post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "comment_count" => comment.post.comments.count,
+                "current_user_following" => false,
                 "author" => {
                   "id" => comment.post.author_id,
                   "username" => comment.post.author.username,
@@ -376,6 +424,7 @@ RSpec.describe "Comment Requests" do
               "text" => comment.post.text,
               "created_at" => comment.post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
               "comment_count" => comment.post.comments.count,
+              "current_user_following" => false,
               "author" => {
                 "id" => comment.post.author_id,
                 "username" => comment.post.author.username,
@@ -423,6 +472,7 @@ RSpec.describe "Comment Requests" do
                   "text" => comment.post.text,
                   "created_at" => comment.post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                   "comment_count" => comment.post.comments.count,
+                  "current_user_following" => false,
                   "author" => {
                     "id" => comment.post.author_id,
                     "username" => comment.post.author.username,
@@ -555,6 +605,7 @@ RSpec.describe "Comment Requests" do
               "text" => comment.post.text,
               "created_at" => comment.post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
               "comment_count" => 0,
+              "current_user_following" => false,
               "author" => {
                 "id" => comment.post.author_id,
                 "username" => comment.post.author.username,
@@ -608,6 +659,7 @@ RSpec.describe "Comment Requests" do
                   "text" => comment.post.text,
                   "created_at" => comment.post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                   "comment_count" => 1,
+                  "current_user_following" => false,
                   "author" => {
                     "id" => comment.post.author_id,
                     "username" => comment.post.author.username,

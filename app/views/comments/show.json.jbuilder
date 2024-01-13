@@ -8,6 +8,12 @@ json.current_user_following(
 
 json.post do
   json.partial! "posts/post", post: @comment.post
+
+  json.current_user_following(
+    logged_in? && Follow.find_by(
+      follower_id: current_user.id, followee_id: @comment.post.author_id
+    ).present?
+  )
 end
 
 json.parent do
