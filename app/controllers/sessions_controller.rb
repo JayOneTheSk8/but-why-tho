@@ -29,7 +29,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    if current_user
+    if logged_in?
       logout!
       head :ok
     else
