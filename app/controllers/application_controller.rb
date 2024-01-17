@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::API
+  before_action :require_client_header
   helper_method :current_user, :logged_in?
 
   def current_user
@@ -29,6 +30,16 @@ class ApplicationController < ActionController::API
           "Must be logged in to manage #{self.class.name.gsub('Controller', '').downcase}."
         ]
       },
+      status: :unauthorized
+    )
+  end
+
+  def require_client_header
+    return if Rails.env.test?
+    return if request.headers["CLIENT-TOKEN"] == ENV["CLIENT_TOKEN"]
+
+    render(
+      json: {errors: ["Unauthorized Request"]},
       status: :unauthorized
     )
   end

@@ -1,5 +1,5 @@
 class CommentsController < ApplicationController
-  before_action :require_login, only: [:create, :update, :destroy]
+  append_before_action :require_login, only: [:create, :update, :destroy]
 
   def show
     id = params[:id]

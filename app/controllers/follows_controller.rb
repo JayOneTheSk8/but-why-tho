@@ -1,5 +1,5 @@
 class FollowsController < ApplicationController
-  before_action :require_login, only: [:create, :destroy]
+  append_before_action :require_login, only: [:create, :destroy]
 
   def create
     @follow = Follow.new(follow_params)

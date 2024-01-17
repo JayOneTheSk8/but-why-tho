@@ -1,5 +1,5 @@
 class RepostsController < ApplicationController
-  before_action(
+  append_before_action(
     :require_login,
     only: [
       :create_comment_repost,

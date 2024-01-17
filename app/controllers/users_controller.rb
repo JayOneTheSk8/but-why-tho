@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :require_login, only: [:update]
+  append_before_action :require_login, only: [:update]
 
   def show
     @user = User

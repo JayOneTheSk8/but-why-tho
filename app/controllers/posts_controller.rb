@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_action(
+  append_before_action(
     :require_login,
     only: [:create, :update, :destroy, :front_page_following]
   )
