@@ -423,7 +423,7 @@ class User < ApplicationRecord
         user_liked: result["user_liked"],
         user_reposted: result["user_reposted"],
         user_followed: result["user_followed"],
-        replying_to: result["replying_to"].presence&.split(","),
+        replying_to: result["replying_to"].presence&.split(",")&.uniq,
         author: {
           id: result["author_id"],
           username: result["author_username"],
@@ -747,7 +747,7 @@ class User < ApplicationRecord
         user_liked: result["user_liked"],
         user_reposted: result["user_reposted"],
         user_followed: result["user_followed"],
-        replying_to: result["replying_to"].presence&.split(","),
+        replying_to: result["replying_to"].presence&.split(",")&.uniq,
         author: {
           id: result["author_id"],
           username: result["author_username"],
@@ -1017,7 +1017,7 @@ class User < ApplicationRecord
         reposted_by: result["reposted_by"],
         user_reposted: result["user_reposted"],
         user_followed: result["user_followed"],
-        replying_to: result["replying_to"].presence&.split(","),
+        replying_to: result["replying_to"].presence&.split(",")&.uniq,
         author: {
           id: result["author_id"],
           username: result["author_username"],
@@ -1555,7 +1555,7 @@ class User < ApplicationRecord
         user_reposted: result["user_reposted"],
         user_followed: result["user_followed"],
         rating: result["post_rating"],
-        replying_to: result["replying_to"].presence&.split(","),
+        replying_to: result["replying_to"].presence&.split(",")&.uniq,
         author: {
           id: result["author_id"],
           username: result["author_username"],

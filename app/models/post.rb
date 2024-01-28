@@ -257,7 +257,7 @@ class Post < ApplicationRecord
         user_reposted: result["user_reposted"],
         user_followed: result["user_followed"],
         rating: result["post_rating"],
-        replying_to: result["replying_to"].presence&.split(","),
+        replying_to: result["replying_to"].presence&.split(",")&.uniq,
         author: {
           id: result["author_id"],
           username: result["author_username"],

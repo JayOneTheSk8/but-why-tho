@@ -19,7 +19,7 @@ module QuestionValidation
       user_liked: result["user_liked"],
       user_reposted: result["user_reposted"],
       user_followed: result["user_followed"],
-      replying_to: result["replying_to"].presence&.split(","),
+      replying_to: result["replying_to"].presence&.split(",")&.uniq,
       author: {
         id: result["author_id"],
         username: result["author_username"],
