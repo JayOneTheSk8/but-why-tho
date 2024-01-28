@@ -1536,7 +1536,8 @@ class User < ApplicationRecord
         ORDER BY
           DATE(apac.post_date) DESC,
           apac.post_rating DESC,
-          apac.id DESC
+          apac.id DESC,
+          apac.post_date DESC
       SQL
 
     results.map do |result|
