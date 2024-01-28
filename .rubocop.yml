@@ -28,6 +28,9 @@ Metrics/MethodLength:
 Metrics/BlockLength:
   Enabled: false
 
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
 Rails/I18nLocaleTexts:
   Enabled: false
 
