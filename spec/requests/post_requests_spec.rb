@@ -2008,6 +2008,7 @@ RSpec.describe "Post Requests" do
           create(:follow, follower: current_user, followee: followee1)
           create(:follow, follower: current_user, followee: followee2)
           create(:follow, follower: current_user, followee: followee3)
+          create(:follow, follower: current_user, followee: current_user_reposted_post.author)
 
           post("/sign_in", params: {user: {login: current_user.username, password: current_user_password}})
         end
@@ -2029,7 +2030,28 @@ RSpec.describe "Post Requests" do
                   "reposted_by" => current_user.display_name,
                   "user_liked" => false,
                   "user_reposted" => true,
-                  "user_followed" => false,
+                  "user_followed" => true,
+                  "rating" => 22 + 3,
+                  "replying_to" => nil,
+                  "author" => {
+                    "id" => current_user_reposted_post.author_id,
+                    "username" => current_user_reposted_post.author.username,
+                    "display_name" => current_user_reposted_post.author.display_name
+                  }
+                },
+                {
+                  "id" => current_user_reposted_post.id,
+                  "text" => current_user_reposted_post.text,
+                  "created_at" => current_user_reposted_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "post_type" => "Post",
+                  "like_count" => current_user_reposted_post_like_count,
+                  "repost_count" => current_user_reposted_post_repost_count + 1,
+                  "comment_count" => current_user_reposted_post_comment_count,
+                  "post_date" => current_user_reposted_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "reposted_by" => nil,
+                  "user_liked" => false,
+                  "user_reposted" => true,
+                  "user_followed" => true,
                   "rating" => 22 + 3,
                   "replying_to" => nil,
                   "author" => {
