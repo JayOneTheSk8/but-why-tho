@@ -66,7 +66,7 @@ Signs a `User` in.
 ```yaml
 {
   "user": {
-    "login": <string> # Username or email or user
+    "login": <string> # Username or email for user
     "password": <string>
   }
 }
@@ -380,7 +380,7 @@ Gets all `User`'s created `Post`s and reposted `Post`s and `Comment`s
 }
 ```
 
-### GET /posts/front_page
+### GET /front_page
 Gets the most popular `Post`s and reposted `Comment`s by date and popularity.
 
 #### Response
