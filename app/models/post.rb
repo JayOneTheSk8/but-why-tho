@@ -319,6 +319,7 @@ class Post < ApplicationRecord
             'PostRepost' as repost_type,
             'PostLike' as like_type,
             'Post' as show_type,
+            NULL as replying_to,
             (
               CASE
               WHEN current_user_likes.like_id IS NOT NULL
@@ -380,6 +381,7 @@ class Post < ApplicationRecord
             'CommentRepost' as repost_type,
             'CommentLike' as like_type,
             'Comment' as show_type,
+            comment_post_author.username as replying_to,
             (
               CASE
               WHEN current_user_likes.like_id IS NOT NULL
@@ -408,6 +410,10 @@ class Post < ApplicationRecord
           FROM comments
           INNER JOIN users comment_authors
             ON comments.author_id = comment_authors.id
+          INNER JOIN posts comment_post
+            ON comment_post.id = comments.post_id
+          INNER JOIN users comment_post_author
+            ON comment_post_author.id = comment_post.author_id
           LEFT OUTER JOIN comments comment_replies
             ON comment_replies.parent_id = comments.id
           LEFT OUTER JOIN current_user_likes
@@ -422,6 +428,7 @@ class Post < ApplicationRecord
           GROUP BY
             comments.id,
             comment_authors.id,
+            comment_post_author.username,
             current_user_likes.like_id,
             current_user_reposts.repost_id,
             current_user_subscriptions.follow_id

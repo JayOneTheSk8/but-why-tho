@@ -1263,6 +1263,7 @@ RSpec.describe "Comment Requests" do
             "user_liked" => false,
             "user_reposted" => false,
             "user_followed" => false,
+            "replying_to" => [lone_comment.post.author.username],
             "author" => {
               "id" => lone_comment.author_id,
               "username" => lone_comment.author.username,
@@ -1278,6 +1279,7 @@ RSpec.describe "Comment Requests" do
               "user_liked" => false,
               "user_reposted" => false,
               "user_followed" => false,
+              "replying_to" => nil,
               "author" => {
                 "id" => lone_comment.post.author_id,
                 "username" => lone_comment.post.author.username,
@@ -1304,6 +1306,7 @@ RSpec.describe "Comment Requests" do
               "user_liked" => false,
               "user_reposted" => false,
               "user_followed" => false,
+              "replying_to" => [parent_comment.author.username, comment_post.author.username],
               "author" => {
                 "id" => comment.author_id,
                 "username" => comment.author.username,
@@ -1319,6 +1322,7 @@ RSpec.describe "Comment Requests" do
                 "user_liked" => false,
                 "user_reposted" => false,
                 "user_followed" => false,
+                "replying_to" => nil,
                 "author" => {
                   "id" => comment_post.author_id,
                   "username" => comment_post.author.username,
@@ -1335,6 +1339,7 @@ RSpec.describe "Comment Requests" do
                 "user_liked" => false,
                 "user_reposted" => false,
                 "user_followed" => false,
+                "replying_to" => [comment_post.author.username],
                 "author" => {
                   "id" => parent_comment.author_id,
                   "username" => parent_comment.author.username,
@@ -1352,6 +1357,7 @@ RSpec.describe "Comment Requests" do
                   "user_liked" => false,
                   "user_reposted" => false,
                   "user_followed" => false,
+                  "replying_to" => [comment.author.username, comment_post.author.username],
                   "author" => {
                     "id" => reply2.author_id,
                     "username" => reply2.author.username,
@@ -1368,6 +1374,7 @@ RSpec.describe "Comment Requests" do
                   "user_liked" => false,
                   "user_reposted" => false,
                   "user_followed" => false,
+                  "replying_to" => [comment.author.username, comment_post.author.username],
                   "author" => {
                     "id" => reply1.author_id,
                     "username" => reply1.author.username,
@@ -1410,6 +1417,7 @@ RSpec.describe "Comment Requests" do
               "user_liked" => true,
               "user_reposted" => false,
               "user_followed" => false,
+              "replying_to" => [parent_comment.author.username, comment_post.author.username],
               "author" => {
                 "id" => comment.author_id,
                 "username" => comment.author.username,
@@ -1425,6 +1433,7 @@ RSpec.describe "Comment Requests" do
                 "user_liked" => false,
                 "user_reposted" => true,
                 "user_followed" => true,
+                "replying_to" => nil,
                 "author" => {
                   "id" => comment_post.author_id,
                   "username" => comment_post.author.username,
@@ -1441,6 +1450,7 @@ RSpec.describe "Comment Requests" do
                 "user_liked" => false,
                 "user_reposted" => true,
                 "user_followed" => false,
+                "replying_to" => [comment_post.author.username],
                 "author" => {
                   "id" => parent_comment.author_id,
                   "username" => parent_comment.author.username,
@@ -1458,6 +1468,7 @@ RSpec.describe "Comment Requests" do
                   "user_liked" => false,
                   "user_reposted" => true,
                   "user_followed" => true,
+                  "replying_to" => [comment.author.username, comment_post.author.username],
                   "author" => {
                     "id" => reply2.author_id,
                     "username" => reply2.author.username,
@@ -1474,6 +1485,7 @@ RSpec.describe "Comment Requests" do
                   "user_liked" => true,
                   "user_reposted" => false,
                   "user_followed" => false,
+                  "replying_to" => [comment.author.username, comment_post.author.username],
                   "author" => {
                     "id" => reply1.author_id,
                     "username" => reply1.author.username,

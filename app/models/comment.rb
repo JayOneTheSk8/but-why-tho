@@ -96,6 +96,18 @@ class Comment < ApplicationRecord
             'CommentRepost' as repost_type,
             'CommentLike' as like_type,
             '#{OG_COMMENT}' as show_type,
+            array_to_string(
+              ARRAY[
+                (
+                  CASE
+                  WHEN parent_comment.id IS NOT NULL
+                    THEN parent_comment_author.username
+                  END
+                ),
+                comment_post_author.username
+              ],
+              ','
+            ) as replying_to,
             (
               CASE
               WHEN current_user_likes.like_id IS NOT NULL
@@ -124,6 +136,14 @@ class Comment < ApplicationRecord
           FROM comments
           INNER JOIN users comment_authors
             ON comments.author_id = comment_authors.id
+          INNER JOIN posts comment_post
+            ON comment_post.id = comments.post_id
+          INNER JOIN users comment_post_author
+            ON comment_post_author.id = comment_post.author_id
+          LEFT OUTER JOIN comments parent_comment
+            ON parent_comment.id = comments.parent_id
+          LEFT OUTER JOIN users parent_comment_author
+            ON parent_comment_author.id = parent_comment.author_id
           LEFT OUTER JOIN comments comment_replies
             ON comment_replies.parent_id = comments.id
           LEFT OUTER JOIN current_user_likes
@@ -138,9 +158,12 @@ class Comment < ApplicationRecord
           GROUP BY
             comments.id,
             comment_authors.id,
+            comment_post_author.username,
             current_user_likes.like_id,
             current_user_reposts.repost_id,
-            current_user_subscriptions.follow_id
+            current_user_subscriptions.follow_id,
+            parent_comment.id,
+            parent_comment_author.username
         ), post_data as (
           SELECT
             posts.id as id,
@@ -152,6 +175,7 @@ class Comment < ApplicationRecord
             'PostRepost' as repost_type,
             'PostLike' as like_type,
             '#{OG_COMMENT_POST}' as show_type,
+            NULL as replying_to,
             (
               CASE
               WHEN current_user_likes.like_id IS NOT NULL
@@ -213,6 +237,18 @@ class Comment < ApplicationRecord
             'CommentRepost' as repost_type,
             'CommentLike' as like_type,
             '#{PARENT_COMMENT}' as show_type,
+            array_to_string(
+              ARRAY[
+                (
+                  CASE
+                  WHEN parent_comment.id IS NOT NULL
+                    THEN parent_comment_author.username
+                  END
+                ),
+                comment_post_author.username
+              ],
+              ','
+            ) as replying_to,
             (
               CASE
               WHEN current_user_likes.like_id IS NOT NULL
@@ -241,6 +277,14 @@ class Comment < ApplicationRecord
           FROM comments
           INNER JOIN users comment_authors
             ON comments.author_id = comment_authors.id
+          INNER JOIN posts comment_post
+            ON comment_post.id = comments.post_id
+          INNER JOIN users comment_post_author
+            ON comment_post_author.id = comment_post.author_id
+          LEFT OUTER JOIN comments parent_comment
+            ON parent_comment.id = comments.parent_id
+          LEFT OUTER JOIN users parent_comment_author
+            ON parent_comment_author.id = parent_comment.author_id
           LEFT OUTER JOIN comments comment_replies
             ON comment_replies.parent_id = comments.id
           LEFT OUTER JOIN current_user_likes
@@ -255,9 +299,12 @@ class Comment < ApplicationRecord
           GROUP BY
             comments.id,
             comment_authors.id,
+            comment_post_author.username,
             current_user_likes.like_id,
             current_user_reposts.repost_id,
-            current_user_subscriptions.follow_id
+            current_user_subscriptions.follow_id,
+            parent_comment.id,
+            parent_comment_author.username
         ), replies_data as (
           SELECT
             comments.id as id,
@@ -269,6 +316,18 @@ class Comment < ApplicationRecord
             'CommentRepost' as repost_type,
             'CommentLike' as like_type,
             '#{OG_COMMENT_REPLY}' as show_type,
+            array_to_string(
+              ARRAY[
+                (
+                  CASE
+                  WHEN parent_comment.id IS NOT NULL
+                    THEN parent_comment_author.username
+                  END
+                ),
+                comment_post_author.username
+              ],
+              ','
+            ) as replying_to,
             (
               CASE
               WHEN current_user_likes.like_id IS NOT NULL
@@ -297,6 +356,14 @@ class Comment < ApplicationRecord
           FROM comments
           INNER JOIN users comment_authors
             ON comments.author_id = comment_authors.id
+          INNER JOIN posts comment_post
+            ON comment_post.id = comments.post_id
+          INNER JOIN users comment_post_author
+            ON comment_post_author.id = comment_post.author_id
+          LEFT OUTER JOIN comments parent_comment
+            ON parent_comment.id = comments.parent_id
+          LEFT OUTER JOIN users parent_comment_author
+            ON parent_comment_author.id = parent_comment.author_id
           LEFT OUTER JOIN comments comment_replies
             ON comment_replies.parent_id = comments.id
           LEFT OUTER JOIN current_user_likes
@@ -311,9 +378,12 @@ class Comment < ApplicationRecord
           GROUP BY
             comments.id,
             comment_authors.id,
+            comment_post_author.username,
             current_user_likes.like_id,
             current_user_reposts.repost_id,
-            current_user_subscriptions.follow_id
+            current_user_subscriptions.follow_id,
+            parent_comment.id,
+            parent_comment_author.username
         ), merged as (
           SELECT * FROM comment_data
           UNION ALL

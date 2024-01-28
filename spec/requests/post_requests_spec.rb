@@ -2262,6 +2262,7 @@ RSpec.describe "Post Requests" do
             "user_liked" => false,
             "user_reposted" => false,
             "user_followed" => false,
+            "replying_to" => nil,
             "author" => {
               "id" => uncommented_post.author_id,
               "username" => uncommented_post.author.username,
@@ -2286,6 +2287,7 @@ RSpec.describe "Post Requests" do
               "user_liked" => false,
               "user_reposted" => false,
               "user_followed" => false,
+              "replying_to" => nil,
               "author" => {
                 "id" => shown_post.author_id,
                 "username" => shown_post.author.username,
@@ -2302,6 +2304,7 @@ RSpec.describe "Post Requests" do
                   "user_liked" => false,
                   "user_reposted" => false,
                   "user_followed" => false,
+                  "replying_to" => [shown_post.author.username],
                   "author" => {
                     "id" => comment2.author_id,
                     "username" => comment2.author.username,
@@ -2318,6 +2321,7 @@ RSpec.describe "Post Requests" do
                   "user_liked" => false,
                   "user_reposted" => false,
                   "user_followed" => false,
+                  "replying_to" => [shown_post.author.username],
                   "author" => {
                     "id" => comment1.author_id,
                     "username" => comment1.author.username,
@@ -2358,6 +2362,7 @@ RSpec.describe "Post Requests" do
               "user_liked" => false,
               "user_reposted" => true,
               "user_followed" => true,
+              "replying_to" => nil,
               "author" => {
                 "id" => shown_post.author_id,
                 "username" => shown_post.author.username,
@@ -2374,6 +2379,7 @@ RSpec.describe "Post Requests" do
                   "user_liked" => true,
                   "user_reposted" => true,
                   "user_followed" => false,
+                  "replying_to" => [shown_post.author.username],
                   "author" => {
                     "id" => comment2.author_id,
                     "username" => comment2.author.username,
@@ -2390,6 +2396,7 @@ RSpec.describe "Post Requests" do
                   "user_liked" => false,
                   "user_reposted" => false,
                   "user_followed" => true,
+                  "replying_to" => [shown_post.author.username],
                   "author" => {
                     "id" => comment1.author_id,
                     "username" => comment1.author.username,
