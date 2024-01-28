@@ -14,17 +14,17 @@ bin/rails db:migrate
 
 ### Run Server
 
-```
+```sh
 bin/rails s
 ```
 
 ### Lint (via Rubocop)
-```
+```sh
 bin/rubocop
 ```
 
 ### Run Test Specs
-```
+```sh
 bin/rspec
 ```
 
