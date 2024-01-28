@@ -10,8 +10,14 @@ Rails.application.routes.draw do
   get "sessions", to: "sessions#show", format: "json"
 
   resources :email_confirmations, only: [:edit, :create], param: :confirmation_token
-  resources :posts, format: "json"
-  resources :comments, only: [:show, :create, :update, :destroy], format: "json"
+
+  resources :posts, format: "json" do
+    get "/data", to: "posts#data"
+  end
+
+  resources :comments, only: [:show, :create, :update, :destroy], format: "json" do
+    get "/data", to: "comments#data"
+  end
 
   post "follows", to: "follows#create", format: "json"
   delete "follows", to: "follows#destroy", format: "json"

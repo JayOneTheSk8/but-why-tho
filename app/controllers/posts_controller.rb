@@ -147,6 +147,23 @@ class PostsController < ApplicationController
     )
   end
 
+  def data
+    id = params[:post_id]
+    @post = Post.find_by(id:)
+
+    if @post.present?
+      render(
+        json: {post: @post.get_data(current_user:)},
+        status: :ok
+      )
+    else
+      render(
+        json: {errors: [not_found_post_error_message(id)]},
+        status: :not_found
+      )
+    end
+  end
+
   private
 
   def post_params

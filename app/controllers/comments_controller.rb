@@ -150,6 +150,23 @@ class CommentsController < ApplicationController
     end
   end
 
+  def data
+    id = params[:comment_id]
+    @comment = Comment.find_by(id:)
+
+    if @comment.present?
+      render(
+        json: {comment: @comment.get_data(current_user:)},
+        status: :ok
+      )
+    else
+      render(
+        json: {errors: [not_found_comment_error_message(id)]},
+        status: :not_found
+      )
+    end
+  end
+
   private
 
   def create_comment_params
