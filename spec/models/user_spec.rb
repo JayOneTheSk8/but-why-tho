@@ -21,17 +21,18 @@ RSpec.describe User do
 
     describe "email attribute" do
       it "does not allow for malformed email addresses" do
-        %w[
-          bademail.com
-          bad@email.c
-          bad@email.com.o
-          @email.com
-          bad@email
-          bad@.com
-          !bad@email.com
-          bad@email..com
-          bad@@email.com
-          ba/d@email.com
+        [
+          "bad email@example.com",
+          "bademail.com",
+          "bad@email.c",
+          "bad@email.com.o",
+          "@email.com",
+          "bad@email",
+          "bad@.com",
+          "!bad@email.com",
+          "bad@email..com",
+          "bad@@email.com",
+          "ba/d@email.com"
         ].each do |email|
           user.assign_attributes(email:)
           expect(user).not_to be_valid
@@ -67,6 +68,11 @@ RSpec.describe User do
       it "allows usernames with periods, hyphens, and underscores" do
         user.assign_attributes(username: "-s0me_0ne.")
         expect(user).to be_valid
+      end
+
+      it "does not allow usernames with spaces" do
+        user.assign_attributes(username: "-s0me 0ne.")
+        expect(user).not_to be_valid
       end
 
       it "does not allow usernames with other characters" do
