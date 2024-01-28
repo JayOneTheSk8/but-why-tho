@@ -510,6 +510,7 @@ Gets the `Post`'s full data with its associated top-level comments.
     "user_liked": <boolean>
     "user_reposted": <boolean>
     "user_followed": <boolean>
+    "replying_to": null
     "author": {
       "id": <bigint>
       "username": <string>
@@ -526,6 +527,7 @@ Gets the `Post`'s full data with its associated top-level comments.
         "user_liked": <boolean>
         "user_reposted": <boolean>
         "user_followed": <boolean>
+        "replying_to": <string[]>
         "author": {
           "id": <bigint>
           "username": <string>
@@ -879,6 +881,7 @@ Gets the `Comment`'s full data with its associated post and optional parent and 
     "user_liked": <boolean>
     "user_reposted": <boolean>
     "user_followed": <boolean>
+    "replying_to": <string[]>
     "author": {
       "id": <bigint>
       "username": <string>
@@ -894,6 +897,7 @@ Gets the `Comment`'s full data with its associated post and optional parent and 
       "user_liked": <boolean>
       "user_reposted": <boolean>
       "user_followed": <boolean>
+      "replying_to": null
       "author": {
         "id": <bigint>
         "username": <string>
@@ -910,6 +914,7 @@ Gets the `Comment`'s full data with its associated post and optional parent and 
       "user_liked": <boolean>
       "user_reposted": <boolean>
       "user_followed": <boolean>
+      "replying_to": <string[]>
       "author": {
         "id": <bigint>
         "username": <string>
@@ -927,6 +932,7 @@ Gets the `Comment`'s full data with its associated post and optional parent and 
         "user_liked": <boolean>
         "user_reposted": <boolean>
         "user_followed": <boolean>
+        "replying_to": <string[]>
         "author": {
           "id": <bigint>
           "username": <string>
