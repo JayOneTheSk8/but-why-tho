@@ -445,6 +445,50 @@ Gets the most popular posts and reposted comments by date and popularity; filter
 }
 ```
 
+### GET /posts/:post_id/data
+Gets the `Post`'s full data with its associated top-level comments. 
+
+#### Response
+```yaml
+{
+  "post": {
+    "id": <bigint>
+    "text": <string>
+    "created_at": <datetime>
+    "comment_count": <int>
+    "like_count": <int>
+    "repost_count": <int>
+    "user_liked": <boolean>
+    "user_reposted": <boolean>
+    "user_followed": <boolean>
+    "author": {
+      "id": <bigint>
+      "username": <string>
+      "display_name": <string>
+    },
+    "comments": [
+      {
+        "id": <bigint>
+        "text": <string>
+        "created_at": <datetime>
+        "comment_count": <int>
+        "like_count": <int>
+        "repost_count": <int>
+        "user_liked": <boolean>
+        "user_reposted": <boolean>
+        "user_followed": <boolean>
+        "author": {
+          "id": <bigint>
+          "username": <string>
+          "display_name": <string>
+        }
+      }
+      ...
+    ]
+  }
+}
+```
+
 ## Comments
 
 ### GET /comments/:id
@@ -767,6 +811,82 @@ Gets the `User`'s created and reposted `Comment`s.
     }
     ...
   ]
+}
+```
+
+### GET /comments/:comment_id/data
+Gets the `Comment`'s full data with its associated post and optional parent and replies. 
+
+#### Response
+```yaml
+{
+  "comment": {
+    "id": <bigint>
+    "text": <string>
+    "created_at": <datetime>
+    "comment_count": <int>
+    "like_count": <int>
+    "repost_count": <int>
+    "user_liked": <boolean>
+    "user_reposted": <boolean>
+    "user_followed": <boolean>
+    "author": {
+      "id": <bigint>
+      "username": <string>
+      "display_name": <string>
+    },
+    "post": {
+      "id": <bigint>
+      "text": <string>
+      "created_at": <datetime>
+      "comment_count": <int>
+      "like_count": <int>
+      "repost_count": <int>
+      "user_liked": <boolean>
+      "user_reposted": <boolean>
+      "user_followed": <boolean>
+      "author": {
+        "id": <bigint>
+        "username": <string>
+        "display_name": <string>
+      }
+    },
+    "parent": { # nullable
+      "id": <bigint>
+      "text": <string>
+      "created_at": <datetime>
+      "comment_count": <int>
+      "like_count": <int>
+      "repost_count": <int>
+      "user_liked": <boolean>
+      "user_reposted": <boolean>
+      "user_followed": <boolean>
+      "author": {
+        "id": <bigint>
+        "username": <string>
+        "display_name": <string>
+      }
+    },
+    "comments": [
+      {
+        "id": <bigint>
+        "text": <string>
+        "created_at": <datetime>
+        "comment_count": <int>
+        "like_count": <int>
+        "repost_count": <int>
+        "user_liked": <boolean>
+        "user_reposted": <boolean>
+        "user_followed": <boolean>
+        "author": {
+          "id": <bigint>
+          "username": <string>
+          "display_name": <string>
+        }
+      }
+      ...
+    ]
+  }
 }
 ```
 
