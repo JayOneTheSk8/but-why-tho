@@ -1316,7 +1316,14 @@ class User < ApplicationRecord
               END
             ) user_liked,
             TRUE as user_reposted,
-            FALSE as user_followed,
+            (
+              CASE
+              WHEN current_user_subscriptions.follow_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_followed,
             COUNT(
               CASE
               WHEN post_comments.parent_id IS NULL
@@ -1331,6 +1338,8 @@ class User < ApplicationRecord
             AND current_user_reposts.message_id = posts.id
           LEFT OUTER JOIN comments post_comments
             ON post_comments.post_id = posts.id
+          LEFT OUTER JOIN current_user_subscriptions
+            ON current_user_subscriptions.followee_id = post_authors.id
           LEFT OUTER JOIN current_user_likes
             ON current_user_likes.like_type = 'PostLike'
             AND current_user_likes.message_id = posts.id
@@ -1341,7 +1350,8 @@ class User < ApplicationRecord
             current_user_reposts.repost_id,
             current_user_reposts.reposted_at,
             current_user_reposts.reposter_display_name,
-            current_user_reposts.repost_type
+            current_user_reposts.repost_type,
+            current_user_subscriptions.follow_id
         ), user_reposted_comments as (
           SELECT
             comments.id as id,
@@ -1376,7 +1386,14 @@ class User < ApplicationRecord
               END
             ) user_liked,
             TRUE as user_reposted,
-            FALSE as user_followed,
+            (
+              CASE
+              WHEN current_user_subscriptions.follow_id IS NOT NULL
+                THEN TRUE
+              ELSE
+                FALSE
+              END
+            ) user_followed,
             COUNT(comment_replies.id) as comment_count
           FROM comments
           INNER JOIN users comment_authors
@@ -1394,6 +1411,8 @@ class User < ApplicationRecord
             ON parent_comment_author.id = parent_comment.author_id
           LEFT OUTER JOIN comments comment_replies
             ON comment_replies.parent_id = comments.id
+          LEFT OUTER JOIN current_user_subscriptions
+            ON current_user_subscriptions.followee_id = comment_authors.id
           LEFT OUTER JOIN current_user_likes
             ON current_user_likes.like_type = 'CommentLike'
             AND current_user_likes.message_id = comments.id
@@ -1404,6 +1423,7 @@ class User < ApplicationRecord
             current_user_reposts.repost_type,
             current_user_reposts.reposted_at,
             current_user_reposts.reposter_display_name,
+            current_user_subscriptions.follow_id,
             current_user_likes.like_id,
             parent_comment.id,
             comment_post_author.username,
