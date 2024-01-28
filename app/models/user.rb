@@ -1500,7 +1500,7 @@ class User < ApplicationRecord
             ON likes.type = final_collection.like_type
             AND likes.message_id = final_collection.id
           GROUP BY
-            likes.type, likes.message_id
+            likes.type, likes.message_id, final_collection.post_date
         ), repost_counts as (
           SELECT
             COUNT(reposts.id) as repost_count,
@@ -1511,7 +1511,7 @@ class User < ApplicationRecord
             ON reposts.type = final_collection.repost_type
             AND reposts.message_id = final_collection.id
           GROUP BY
-            reposts.type, reposts.message_id
+            reposts.type, reposts.message_id, final_collection.post_date
         ), all_posts_and_comments as (
           SELECT
             final_collection.*,
@@ -1530,7 +1530,8 @@ class User < ApplicationRecord
             ON repost_counts.message_type = final_collection.repost_type
             AND repost_counts.message_id = final_collection.id
         )
-        SELECT apac.*
+        SELECT
+          DISTINCT apac.*, DATE(apac.post_date)
         FROM all_posts_and_comments apac
         ORDER BY
           DATE(apac.post_date) DESC,
