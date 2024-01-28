@@ -91,7 +91,12 @@ class Post < ApplicationRecord
                 FALSE
               END
             ) user_followed,
-            COUNT(post_comments.id) as comment_count
+            COUNT(
+              CASE
+              WHEN post_comments.parent_id IS NULL
+                THEN post_comments.id
+              END
+            ) as comment_count
           FROM posts
           INNER JOIN users post_authors
             ON posts.author_id = post_authors.id

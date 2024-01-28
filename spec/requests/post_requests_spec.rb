@@ -1089,6 +1089,9 @@ RSpec.describe "Post Requests" do
       post_with_irrelevant_comment1.update_columns(created_at: Time.current - 2.days)
       post_with_irrelevant_comment2.update_columns(created_at: Time.current - 2.days)
       post_with_irrelevant_comment3.update_columns(created_at: Time.current - 2.days)
+
+      # Add reply for todays_post3 to validate comment counts
+      create(:comment, :reply, :replied, comment: todays_post3.comments.last, post_id: todays_post3.id)
     end
 
     describe "GET /posts/front_page" do
@@ -1404,12 +1407,12 @@ RSpec.describe "Post Requests" do
                 "post_type" => "Post",
                 "like_count" => 0,
                 "repost_count" => 0,
-                "comment_count" => post_with_irrelevant_comment3_comment_count,
+                "comment_count" => 1,
                 "post_date" => post_with_irrelevant_comment3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                 "user_liked" => false,
                 "user_reposted" => false,
                 "user_followed" => false,
-                "rating" => 8,
+                "rating" => 1,
                 "replying_to" => nil,
                 "author" => {
                   "id" => post_with_irrelevant_comment3.author_id,
@@ -1818,12 +1821,12 @@ RSpec.describe "Post Requests" do
                   "post_type" => "Post",
                   "like_count" => 0,
                   "repost_count" => 0,
-                  "comment_count" => post_with_irrelevant_comment3_comment_count,
+                  "comment_count" => 1,
                   "post_date" => post_with_irrelevant_comment3.created_at.strftime("%Y-%m-%dT%T.%LZ"),
                   "user_liked" => false,
                   "user_reposted" => false,
                   "user_followed" => false,
-                  "rating" => 8,
+                  "rating" => 1,
                   "replying_to" => nil,
                   "author" => {
                     "id" => post_with_irrelevant_comment3.author_id,
