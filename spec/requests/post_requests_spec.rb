@@ -2204,4 +2204,211 @@ RSpec.describe "Post Requests" do
     end
     # rubocop:enable Rails/DurationArithmetic, Rails/SkipsModelValidations
   end
+
+  describe "GET /posts/:post_id/data" do
+    let(:post_like_count) { 3 }
+    let(:post_repost_count) { 2 }
+
+    let(:comment1_like_count) { 2 }
+    let(:comment1_repost_count) { 4 }
+
+    let(:comment2_like_count) { 5 }
+    let(:comment2_repost_count) { 3 }
+
+    let!(:shown_post) do
+      create(
+        :post,
+        :liked,
+        :reposted,
+        like_count: post_like_count,
+        repost_count: post_repost_count
+      )
+    end
+    let!(:comment1) do
+      create(
+        :comment,
+        :liked,
+        :reposted,
+        :replied,
+        post_id: shown_post.id,
+        like_count: comment1_like_count,
+        repost_count: comment1_repost_count
+      )
+    end
+    let!(:comment2) do
+      create(
+        :comment,
+        :liked,
+        :reposted,
+        post_id: shown_post.id,
+        like_count: comment2_like_count,
+        repost_count: comment2_repost_count
+      )
+    end
+
+    context "when post exists" do
+      let!(:uncommented_post) { create(:post, :liked, :reposted) }
+
+      it "returns the post's data" do
+        get "/posts/#{uncommented_post.id}/data"
+        expect(response.parsed_body).to eq(
+          "post" => {
+            "id" => uncommented_post.id,
+            "text" => uncommented_post.text,
+            "created_at" => uncommented_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+            "comment_count" => 0,
+            "like_count" => 1,
+            "repost_count" => 1,
+            "user_liked" => false,
+            "user_reposted" => false,
+            "user_followed" => false,
+            "author" => {
+              "id" => uncommented_post.author_id,
+              "username" => uncommented_post.author.username,
+              "display_name" => uncommented_post.author.display_name
+            },
+            "comments" => []
+          }
+        )
+      end
+
+      context "with comments" do
+        it "returns the post's top-level comments" do
+          get "/posts/#{shown_post.id}/data"
+          expect(response.parsed_body).to eq(
+            "post" => {
+              "id" => shown_post.id,
+              "text" => shown_post.text,
+              "created_at" => shown_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+              "comment_count" => 2,
+              "like_count" => post_like_count,
+              "repost_count" => post_repost_count,
+              "user_liked" => false,
+              "user_reposted" => false,
+              "user_followed" => false,
+              "author" => {
+                "id" => shown_post.author_id,
+                "username" => shown_post.author.username,
+                "display_name" => shown_post.author.display_name
+              },
+              "comments" => [
+                {
+                  "id" => comment2.id,
+                  "text" => comment2.text,
+                  "created_at" => comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "comment_count" => 0,
+                  "like_count" => comment2_like_count,
+                  "repost_count" => comment2_repost_count,
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "author" => {
+                    "id" => comment2.author_id,
+                    "username" => comment2.author.username,
+                    "display_name" => comment2.author.display_name
+                  }
+                },
+                {
+                  "id" => comment1.id,
+                  "text" => comment1.text,
+                  "created_at" => comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "comment_count" => 1,
+                  "like_count" => comment1_like_count,
+                  "repost_count" => comment1_repost_count,
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "author" => {
+                    "id" => comment1.author_id,
+                    "username" => comment1.author.username,
+                    "display_name" => comment1.author.display_name
+                  }
+                }
+              ]
+            }
+          )
+        end
+      end
+
+      context "when user is logged in" do
+        let!(:user) { create(:user) }
+
+        before do
+          create(:follow, follower: user, followee: comment1.author)
+          create(:follow, follower: user, followee: shown_post.author)
+
+          create(:comment_like, user:, message_id: comment2.id)
+
+          create(:comment_repost, user:, message_id: comment2.id)
+          create(:post_repost, user:, message_id: shown_post.id)
+
+          post("/sign_in", params: {user: {login: user.username, password: user.password}})
+        end
+
+        it "notates whether the current user liked or reposted the message or followed the author" do
+          get "/posts/#{shown_post.id}/data"
+          expect(response.parsed_body).to eq(
+            "post" => {
+              "id" => shown_post.id,
+              "text" => shown_post.text,
+              "created_at" => shown_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+              "comment_count" => 2,
+              "like_count" => post_like_count,
+              "repost_count" => post_repost_count + 1,
+              "user_liked" => false,
+              "user_reposted" => true,
+              "user_followed" => true,
+              "author" => {
+                "id" => shown_post.author_id,
+                "username" => shown_post.author.username,
+                "display_name" => shown_post.author.display_name
+              },
+              "comments" => [
+                {
+                  "id" => comment2.id,
+                  "text" => comment2.text,
+                  "created_at" => comment2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "comment_count" => 0,
+                  "like_count" => comment2_like_count + 1,
+                  "repost_count" => comment2_repost_count + 1,
+                  "user_liked" => true,
+                  "user_reposted" => true,
+                  "user_followed" => false,
+                  "author" => {
+                    "id" => comment2.author_id,
+                    "username" => comment2.author.username,
+                    "display_name" => comment2.author.display_name
+                  }
+                },
+                {
+                  "id" => comment1.id,
+                  "text" => comment1.text,
+                  "created_at" => comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "comment_count" => 1,
+                  "like_count" => comment1_like_count,
+                  "repost_count" => comment1_repost_count,
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => true,
+                  "author" => {
+                    "id" => comment1.author_id,
+                    "username" => comment1.author.username,
+                    "display_name" => comment1.author.display_name
+                  }
+                }
+              ]
+            }
+          )
+        end
+      end
+    end
+
+    context "when post does not exist" do
+      it "returns a not found error" do
+        get "/posts/0/data"
+        expect(response.parsed_body).to eq "errors" => ["Unable to find Post at given ID: 0"]
+        expect(response).to have_http_status :not_found
+      end
+    end
+  end
 end

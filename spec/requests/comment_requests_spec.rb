@@ -1177,4 +1177,322 @@ RSpec.describe "Comment Requests" do
       end
     end
   end
+
+  describe "GET /comments/:comment_id/data" do
+    let(:post_like_count) { 3 }
+    let(:post_repost_count) { 2 }
+
+    let(:parent_comment_like_count) { 2 }
+    let(:parent_comment_repost_count) { 1 }
+
+    let(:comment_like_count) { 4 }
+    let(:comment_repost_count) { 5 }
+
+    let(:reply1_like_count) { 2 }
+    let(:reply1_repost_count) { 4 }
+
+    let(:reply2_like_count) { 4 }
+    let(:reply2_repost_count) { 3 }
+
+    let!(:comment_post) do
+      create(
+        :post,
+        :liked,
+        :reposted,
+        like_count: post_like_count,
+        repost_count: post_repost_count
+      )
+    end
+    let!(:parent_comment) do
+      create(
+        :comment,
+        :liked,
+        :reposted,
+        post_id: comment_post.id,
+        like_count: parent_comment_like_count,
+        repost_count: parent_comment_repost_count
+      )
+    end
+    let!(:comment) do
+      create(
+        :comment,
+        :liked,
+        :reposted,
+        parent_id: parent_comment.id,
+        post_id: comment_post.id,
+        like_count: comment_like_count,
+        repost_count: comment_repost_count
+      )
+    end
+    let!(:reply1) do
+      create(
+        :comment,
+        :liked,
+        :reposted,
+        parent_id: comment.id,
+        post_id: comment_post.id,
+        like_count: reply1_like_count,
+        repost_count: reply1_repost_count
+      )
+    end
+    let!(:reply2) do
+      create(
+        :comment,
+        :liked,
+        :reposted,
+        parent_id: comment.id,
+        post_id: comment_post.id,
+        like_count: reply2_like_count,
+        repost_count: reply2_repost_count
+      )
+    end
+
+    context "when comment exists" do
+      let!(:lone_comment) { create(:comment, :liked, :reposted) }
+
+      it "returns the comments data" do
+        get "/comments/#{lone_comment.id}/data"
+        expect(response.parsed_body).to eq(
+          "comment" => {
+            "id" => lone_comment.id,
+            "text" => lone_comment.text,
+            "created_at" => lone_comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+            "comment_count" => 0,
+            "like_count" => 1,
+            "repost_count" => 1,
+            "user_liked" => false,
+            "user_reposted" => false,
+            "user_followed" => false,
+            "author" => {
+              "id" => lone_comment.author_id,
+              "username" => lone_comment.author.username,
+              "display_name" => lone_comment.author.display_name
+            },
+            "post" => {
+              "id" => lone_comment.post.id,
+              "text" => lone_comment.post.text,
+              "created_at" => lone_comment.post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+              "comment_count" => 1,
+              "like_count" => 0,
+              "repost_count" => 0,
+              "user_liked" => false,
+              "user_reposted" => false,
+              "user_followed" => false,
+              "author" => {
+                "id" => lone_comment.post.author_id,
+                "username" => lone_comment.post.author.username,
+                "display_name" => lone_comment.post.author.display_name
+              }
+            },
+            "parent" => nil,
+            "comments" => []
+          }
+        )
+      end
+
+      context "with a parent comment and replies" do
+        it "returns parent comment and replies' data" do
+          get "/comments/#{comment.id}/data"
+          expect(response.parsed_body).to eq(
+            "comment" => {
+              "id" => comment.id,
+              "text" => comment.text,
+              "created_at" => comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+              "comment_count" => 2,
+              "like_count" => comment_like_count,
+              "repost_count" => comment_repost_count,
+              "user_liked" => false,
+              "user_reposted" => false,
+              "user_followed" => false,
+              "author" => {
+                "id" => comment.author_id,
+                "username" => comment.author.username,
+                "display_name" => comment.author.display_name
+              },
+              "post" => {
+                "id" => comment_post.id,
+                "text" => comment_post.text,
+                "created_at" => comment_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "comment_count" => 1,
+                "like_count" => post_like_count,
+                "repost_count" => post_repost_count,
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "author" => {
+                  "id" => comment_post.author_id,
+                  "username" => comment_post.author.username,
+                  "display_name" => comment_post.author.display_name
+                }
+              },
+              "parent" => {
+                "id" => parent_comment.id,
+                "text" => parent_comment.text,
+                "created_at" => parent_comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "comment_count" => 1,
+                "like_count" => parent_comment_like_count,
+                "repost_count" => parent_comment_repost_count,
+                "user_liked" => false,
+                "user_reposted" => false,
+                "user_followed" => false,
+                "author" => {
+                  "id" => parent_comment.author_id,
+                  "username" => parent_comment.author.username,
+                  "display_name" => parent_comment.author.display_name
+                }
+              },
+              "comments" => [
+                {
+                  "id" => reply2.id,
+                  "text" => reply2.text,
+                  "created_at" => reply2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "comment_count" => 0,
+                  "like_count" => reply2_like_count,
+                  "repost_count" => reply2_repost_count,
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "author" => {
+                    "id" => reply2.author_id,
+                    "username" => reply2.author.username,
+                    "display_name" => reply2.author.display_name
+                  }
+                },
+                {
+                  "id" => reply1.id,
+                  "text" => reply1.text,
+                  "created_at" => reply1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "comment_count" => 0,
+                  "like_count" => reply1_like_count,
+                  "repost_count" => reply1_repost_count,
+                  "user_liked" => false,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "author" => {
+                    "id" => reply1.author_id,
+                    "username" => reply1.author.username,
+                    "display_name" => reply1.author.display_name
+                  }
+                }
+              ]
+            }
+          )
+        end
+      end
+
+      context "when a user is logged in" do
+        let!(:user) { create(:user) }
+
+        before do
+          create(:follow, follower: user, followee: reply2.author)
+          create(:follow, follower: user, followee: comment_post.author)
+
+          create(:comment_like, user:, message_id: comment.id)
+          create(:comment_like, user:, message_id: reply1.id)
+
+          create(:comment_repost, user:, message_id: parent_comment.id)
+          create(:comment_repost, user:, message_id: reply2.id)
+          create(:post_repost, user:, message_id: comment_post.id)
+
+          post("/sign_in", params: {user: {login: user.username, password: user.password}})
+        end
+
+        it "notates whether the current user liked or reposted the message or followed the author" do
+          get "/comments/#{comment.id}/data"
+          expect(response.parsed_body).to eq(
+            "comment" => {
+              "id" => comment.id,
+              "text" => comment.text,
+              "created_at" => comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+              "comment_count" => 2,
+              "like_count" => comment_like_count + 1,
+              "repost_count" => comment_repost_count,
+              "user_liked" => true,
+              "user_reposted" => false,
+              "user_followed" => false,
+              "author" => {
+                "id" => comment.author_id,
+                "username" => comment.author.username,
+                "display_name" => comment.author.display_name
+              },
+              "post" => {
+                "id" => comment_post.id,
+                "text" => comment_post.text,
+                "created_at" => comment_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "comment_count" => 1,
+                "like_count" => post_like_count,
+                "repost_count" => post_repost_count + 1,
+                "user_liked" => false,
+                "user_reposted" => true,
+                "user_followed" => true,
+                "author" => {
+                  "id" => comment_post.author_id,
+                  "username" => comment_post.author.username,
+                  "display_name" => comment_post.author.display_name
+                }
+              },
+              "parent" => {
+                "id" => parent_comment.id,
+                "text" => parent_comment.text,
+                "created_at" => parent_comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                "comment_count" => 1,
+                "like_count" => parent_comment_like_count,
+                "repost_count" => parent_comment_repost_count + 1,
+                "user_liked" => false,
+                "user_reposted" => true,
+                "user_followed" => false,
+                "author" => {
+                  "id" => parent_comment.author_id,
+                  "username" => parent_comment.author.username,
+                  "display_name" => parent_comment.author.display_name
+                }
+              },
+              "comments" => [
+                {
+                  "id" => reply2.id,
+                  "text" => reply2.text,
+                  "created_at" => reply2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "comment_count" => 0,
+                  "like_count" => reply2_like_count,
+                  "repost_count" => reply2_repost_count + 1,
+                  "user_liked" => false,
+                  "user_reposted" => true,
+                  "user_followed" => true,
+                  "author" => {
+                    "id" => reply2.author_id,
+                    "username" => reply2.author.username,
+                    "display_name" => reply2.author.display_name
+                  }
+                },
+                {
+                  "id" => reply1.id,
+                  "text" => reply1.text,
+                  "created_at" => reply1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                  "comment_count" => 0,
+                  "like_count" => reply1_like_count + 1,
+                  "repost_count" => reply1_repost_count,
+                  "user_liked" => true,
+                  "user_reposted" => false,
+                  "user_followed" => false,
+                  "author" => {
+                    "id" => reply1.author_id,
+                    "username" => reply1.author.username,
+                    "display_name" => reply1.author.display_name
+                  }
+                }
+              ]
+            }
+          )
+        end
+      end
+    end
+
+    context "when comment does not exist" do
+      it "returns a not found error" do
+        get "/comments/0/data"
+        expect(response.parsed_body).to eq "errors" => ["Unable to find Comment at given ID: 0"]
+        expect(response).to have_http_status :not_found
+      end
+    end
+  end
 end
