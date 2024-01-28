@@ -59,7 +59,7 @@ class Comment < ApplicationRecord
     ]
 
     sql_results =
-      ActiveRecord::Base.connection.select_all(<<~SQL.squish, "Following Posts", binds).to_a
+      ActiveRecord::Base.connection.select_all(<<~SQL.squish, "Comment Data", binds).to_a
         WITH current_user_reposts as (
           SELECT
             reposts.id as repost_id,
