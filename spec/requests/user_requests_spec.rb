@@ -10,6 +10,7 @@ RSpec.describe "User Requests" do
         "display_name" => user.display_name,
         "email" => user.email,
         "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+        "post_count" => 0,
         "following_count" => 0,
         "follower_count" => 0
       }
@@ -44,8 +45,34 @@ RSpec.describe "User Requests" do
             "display_name" => user.display_name,
             "email" => user.email,
             "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+            "post_count" => 0,
             "following_count" => following_count,
             "follower_count" => follower_count
+          }
+        )
+      end
+    end
+
+    context "with posts" do
+      let(:post_count) { 3 }
+
+      before do
+        create_list(:post, rand(5..10))
+        create_list(:post, post_count, author_id: user.id)
+      end
+
+      it "returns the appropriate count" do
+        get "/users/#{user.username}"
+        expect(response.parsed_body).to eq(
+          {
+            "id" => user.id,
+            "username" => user.username,
+            "display_name" => user.display_name,
+            "email" => user.email,
+            "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+            "post_count" => post_count,
+            "following_count" => 0,
+            "follower_count" => 0
           }
         )
       end
@@ -88,6 +115,7 @@ RSpec.describe "User Requests" do
               "display_name" => updated_display_name,
               "email" => updated_email,
               "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+              "post_count" => 0,
               "following_count" => 0,
               "follower_count" => 0
             }
@@ -108,6 +136,7 @@ RSpec.describe "User Requests" do
               "display_name" => updated_display_name,
               "email" => updated_email,
               "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+              "post_count" => 0,
               "following_count" => 0,
               "follower_count" => 0
             }
