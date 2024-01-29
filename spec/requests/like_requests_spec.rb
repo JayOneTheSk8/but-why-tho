@@ -450,9 +450,10 @@ RSpec.describe "Like Requests" do
         let(:current_user_password) { "N3wCUrr3n+U5er" }
         let!(:current_user) { create(:user, password: current_user_password) }
 
+        let!(:current_user_like1) { create(:post_like, user: current_user, message_id: post1.id) }
+        let!(:current_user_like2) { create(:comment_like, user: current_user, message_id: comment1.id) }
+
         before do
-          create(:post_like, user: current_user, message_id: post1.id)
-          create(:comment_like, user: current_user, message_id: comment1.id)
           create(:comment_repost, user: current_user, message_id: comment1.id)
           create(:post_repost, user: current_user, message_id: post2.id)
           create(:follow, follower: current_user, followee: post1.author)
@@ -573,6 +574,62 @@ RSpec.describe "Like Requests" do
               ]
             }
           )
+        end
+
+        context "when current user is getting their likes" do
+          it "returns 'You' as the 'reposted_by' if necessary" do
+            get "/users/#{current_user.id}/likes"
+            expect(response.parsed_body).to eq(
+              {
+                "user" => {
+                  "username" => current_user.username,
+                  "display_name" => current_user.display_name
+                },
+                "likes" => [
+                  {
+                    "id" => comment1.id,
+                    "text" => comment1.text,
+                    "created_at" => comment1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                    "like_type" => "CommentLike",
+                    "like_count" => comment1_like_count + 1 + 1,
+                    "liked_at" => current_user_like2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                    "repost_count" => comment1_repost_count + 1,
+                    "comment_count" => 0,
+                    "reposted_by" => "You",
+                    "user_reposted" => true,
+                    "user_liked" => true,
+                    "user_followed" => false,
+                    "replying_to" => [comment1.post.author.username],
+                    "author" => {
+                      "id" => comment1.author_id,
+                      "username" => comment1.author.username,
+                      "display_name" => comment1.author.display_name
+                    }
+                  },
+                  {
+                    "id" => post1.id,
+                    "text" => post1.text,
+                    "created_at" => post1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                    "like_type" => "PostLike",
+                    "like_count" => post1_like_count + 1 + 1,
+                    "liked_at" => current_user_like1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                    "repost_count" => 0,
+                    "comment_count" => post1_comment_count,
+                    "reposted_by" => nil,
+                    "user_reposted" => false,
+                    "user_liked" => true,
+                    "user_followed" => true,
+                    "replying_to" => nil,
+                    "author" => {
+                      "id" => post1.author_id,
+                      "username" => post1.author.username,
+                      "display_name" => post1.author.display_name
+                    }
+                  }
+                ]
+              }
+            )
+          end
         end
       end
     end

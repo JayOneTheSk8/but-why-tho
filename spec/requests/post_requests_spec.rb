@@ -775,11 +775,12 @@ RSpec.describe "Post Requests" do
         let(:current_user_password) { "N3wCUrr3n+U5er" }
         let!(:current_user) { create(:user, password: current_user_password) }
 
+        let!(:current_user_repost1) { create(:comment_repost, user: current_user, message_id: reposted_comment.id) }
+        let!(:current_user_repost2) { create(:post_repost, user: current_user, message_id: reposted_post.id) }
+
         before do
           create(:post_like, user: current_user, message_id: user_post.id)
           create(:comment_like, user: current_user, message_id: reposted_reply.id)
-          create(:comment_repost, user: current_user, message_id: reposted_comment.id)
-          create(:post_repost, user: current_user, message_id: reposted_post.id)
           create(:follow, follower: current_user, followee: reposted_reply.author)
           create(:follow, follower: current_user, followee: reposted_post.author)
 
@@ -878,6 +879,62 @@ RSpec.describe "Post Requests" do
               ]
             }
           )
+        end
+
+        context "when current user is getting their linked posts" do
+          it "returns 'You' as the 'reposted_by' if necessary" do
+            get "/users/#{current_user.id}/linked_posts"
+            expect(response.parsed_body).to eq(
+              {
+                "user" => {
+                  "username" => current_user.username,
+                  "display_name" => current_user.display_name
+                },
+                "posts" => [
+                  {
+                    "id" => reposted_post.id,
+                    "text" => reposted_post.text,
+                    "created_at" => reposted_post.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                    "post_type" => "PostRepost",
+                    "like_count" => reposted_post_like_count,
+                    "repost_count" => reposted_post_repost_count + 1 + 1,
+                    "comment_count" => reposted_post_comment_count,
+                    "post_date" => current_user_repost2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                    "reposted_by" => "You",
+                    "user_liked" => false,
+                    "user_reposted" => true,
+                    "user_followed" => true,
+                    "replying_to" => nil,
+                    "author" => {
+                      "id" => reposted_post.author_id,
+                      "username" => reposted_post.author.username,
+                      "display_name" => reposted_post.author.display_name
+                    }
+                  },
+                  {
+                    "id" => reposted_comment.id,
+                    "text" => reposted_comment.text,
+                    "created_at" => reposted_comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                    "post_type" => "CommentRepost",
+                    "like_count" => reposted_comment_like_count,
+                    "repost_count" => reposted_comment_repost_count + 1 + 1,
+                    "comment_count" => reposted_comment_comment_count,
+                    "post_date" => current_user_repost1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                    "reposted_by" => "You",
+                    "user_liked" => false,
+                    "user_reposted" => true,
+                    "user_followed" => false,
+                    "replying_to" => [reposted_comment.post.author.username],
+                    "author" => {
+                      "id" => reposted_comment.author_id,
+                      "username" => reposted_comment.author.username,
+                      "display_name" => reposted_comment.author.display_name
+                    }
+                  }
+                ]
+              }
+            )
+          end
         end
       end
     end
@@ -2030,7 +2087,7 @@ RSpec.describe "Post Requests" do
                   "repost_count" => current_user_reposted_post_repost_count + 1,
                   "comment_count" => current_user_reposted_post_comment_count,
                   "post_date" => current_user_reposted_post_repost.created_at.strftime("%Y-%m-%dT%T.%LZ"),
-                  "reposted_by" => current_user.display_name,
+                  "reposted_by" => "You",
                   "user_liked" => false,
                   "user_reposted" => true,
                   "user_followed" => true,

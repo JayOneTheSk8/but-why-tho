@@ -176,7 +176,8 @@ class User < ApplicationRecord
             reposts.created_at as reposted_at,
             reposts.type as repost_type,
             reposts.message_id as message_id,
-            reposter.display_name as reposter_display_name
+            reposter.display_name as reposter_display_name,
+            reposter.id as reposter_id
           FROM reposts
           INNER JOIN users reposter
             ON reposter.id = reposts.user_id
@@ -229,7 +230,12 @@ class User < ApplicationRecord
             (
               CASE
               WHEN user_reposts.repost_id IS NOT NULL
-                THEN user_reposts.reposter_display_name
+                THEN
+                  CASE
+                  WHEN user_reposts.reposter_id = $2
+                    THEN 'You'
+                  ELSE user_reposts.reposter_display_name
+                  END
               ELSE
                 NULL
               END
@@ -269,7 +275,8 @@ class User < ApplicationRecord
             current_user_reposts.repost_id,
             current_user_subscriptions.follow_id,
             user_reposts.repost_id,
-            user_reposts.reposter_display_name
+            user_reposts.reposter_display_name,
+            user_reposts.reposter_id
         ), liked_comments as (
           SELECT
             comments.id as id,
@@ -321,7 +328,12 @@ class User < ApplicationRecord
             (
               CASE
               WHEN user_reposts.repost_id IS NOT NULL
-                THEN user_reposts.reposter_display_name
+                THEN
+                  CASE
+                  WHEN user_reposts.reposter_id = $2
+                    THEN 'You'
+                  ELSE user_reposts.reposter_display_name
+                  END
               ELSE
                 NULL
               END
@@ -367,7 +379,8 @@ class User < ApplicationRecord
             parent_comment_author.username,
             current_user_subscriptions.follow_id,
             user_reposts.repost_id,
-            user_reposts.reposter_display_name
+            user_reposts.reposter_display_name,
+            user_reposts.reposter_id
         ), merged as (
           SELECT * FROM liked_posts
           UNION ALL
@@ -466,7 +479,8 @@ class User < ApplicationRecord
             reposts.created_at as reposted_at,
             reposts.type as repost_type,
             reposts.message_id as message_id,
-            reposter.display_name as reposter_display_name
+            reposter.display_name as reposter_display_name,
+            reposter.id as reposter_id
           FROM reposts
           INNER JOIN users reposter
             ON reposter.id = reposts.user_id
@@ -480,7 +494,13 @@ class User < ApplicationRecord
             post_authors.username as author_username,
             post_authors.display_name as author_display_name,
             user_reposts.reposted_at as post_date,
-            user_reposts.reposter_display_name as reposted_by,
+            (
+              CASE
+              WHEN user_reposts.reposter_id = $2
+                THEN 'You'
+              ELSE user_reposts.reposter_display_name
+              END
+            ) as reposted_by,
             user_reposts.repost_type as post_type,
             user_reposts.repost_type as repost_type,
             'PostLike' as like_type,
@@ -537,6 +557,7 @@ class User < ApplicationRecord
             user_reposts.repost_type,
             user_reposts.reposted_at,
             user_reposts.reposter_display_name,
+            user_reposts.reposter_id,
             current_user_likes.like_id,
             current_user_reposts.repost_id,
             current_user_subscriptions.follow_id
@@ -549,7 +570,13 @@ class User < ApplicationRecord
             comment_authors.username as author_username,
             comment_authors.display_name as author_display_name,
             user_reposts.reposted_at as post_date,
-            user_reposts.reposter_display_name as reposted_by,
+            (
+              CASE
+              WHEN user_reposts.reposter_id = $2
+                THEN 'You'
+              ELSE user_reposts.reposter_display_name
+              END
+            ) as reposted_by,
             user_reposts.repost_type as post_type,
             user_reposts.repost_type as repost_type,
             'CommentLike' as like_type,
@@ -620,6 +647,7 @@ class User < ApplicationRecord
             user_reposts.repost_type,
             user_reposts.reposted_at,
             user_reposts.reposter_display_name,
+            user_reposts.reposter_id,
             current_user_likes.like_id,
             current_user_reposts.repost_id,
             parent_comment.id,
@@ -790,7 +818,8 @@ class User < ApplicationRecord
             reposts.created_at as reposted_at,
             reposts.type as repost_type,
             reposts.message_id as message_id,
-            reposter.display_name as reposter_display_name
+            reposter.display_name as reposter_display_name,
+            reposter.id as reposter_id
           FROM reposts
           INNER JOIN users reposter
             ON reposter.id = reposts.user_id
@@ -804,7 +833,13 @@ class User < ApplicationRecord
             comment_authors.username as author_username,
             comment_authors.display_name as author_display_name,
             user_reposts.reposted_at as post_date,
-            user_reposts.reposter_display_name as reposted_by,
+            (
+              CASE
+              WHEN user_reposts.reposter_id = $2
+                THEN 'You'
+              ELSE user_reposts.reposter_display_name
+              END
+            ) as reposted_by,
             user_reposts.repost_type as post_type,
             user_reposts.repost_type as repost_type,
             'CommentLike' as like_type,
@@ -875,6 +910,7 @@ class User < ApplicationRecord
             user_reposts.repost_type,
             user_reposts.reposted_at,
             user_reposts.reposter_display_name,
+            user_reposts.reposter_id,
             current_user_likes.like_id,
             current_user_reposts.repost_id,
             parent_comment.id,
@@ -1044,7 +1080,8 @@ class User < ApplicationRecord
             reposts.created_at as reposted_at,
             reposts.type as repost_type,
             reposts.message_id as message_id,
-            reposter.display_name as reposter_display_name
+            reposter.display_name as reposter_display_name,
+            reposter.id as reposter_id
           FROM reposts
           INNER JOIN users reposter
             ON reposter.id = reposts.user_id
@@ -1069,7 +1106,8 @@ class User < ApplicationRecord
             reposts.created_at as reposted_at,
             reposts.type as repost_type,
             reposts.message_id as message_id,
-            reposter.display_name as reposter_display_name
+            reposter.display_name as reposter_display_name,
+            reposter.id as reposter_id
           FROM reposts
           INNER JOIN users reposter
             ON reposter.id = reposts.user_id
@@ -1304,7 +1342,7 @@ class User < ApplicationRecord
             current_user_reposts.reposted_at as post_date,
             current_user_reposts.repost_type as post_type,
             current_user_reposts.repost_type as repost_type,
-            current_user_reposts.reposter_display_name as reposted_by,
+            'You' as reposted_by,
             'PostLike' as like_type,
             NULL as replying_to,
             (
@@ -1363,7 +1401,7 @@ class User < ApplicationRecord
             current_user_reposts.reposted_at as post_date,
             current_user_reposts.repost_type as post_type,
             current_user_reposts.repost_type as repost_type,
-            current_user_reposts.reposter_display_name as reposted_by,
+            'You' as reposted_by,
             'CommentLike' as like_type,
             array_to_string(
               ARRAY[

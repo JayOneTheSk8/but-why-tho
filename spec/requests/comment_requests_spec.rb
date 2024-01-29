@@ -1060,12 +1060,12 @@ RSpec.describe "Comment Requests" do
         let(:current_user_password) { "N3wCUrr3n+U5er" }
         let!(:current_user) { create(:user, password: current_user_password) }
 
+        let!(:current_user_repost1) { create(:comment_repost, user: current_user, message_id: reposted_reply.id) }
+        let!(:current_user_repost2) { create(:comment_repost, user: current_user, message_id: user_comment.id) }
+
         before do
           create(:comment_like, user: current_user, message_id: reposted_comment.id)
           create(:comment_like, user: current_user, message_id: user_comment.id)
-
-          create(:comment_repost, user: current_user, message_id: reposted_reply.id)
-          create(:comment_repost, user: current_user, message_id: user_comment.id)
 
           create(:follow, follower: current_user, followee: reposted_reply.author)
           create(:follow, follower: current_user, followee: user_reply.author)
@@ -1165,6 +1165,62 @@ RSpec.describe "Comment Requests" do
               ]
             }
           )
+        end
+
+        context "when current user is getting their linked comments" do
+          it "returns 'You' as the 'reposted_by' if necessary" do
+            get "/users/#{current_user.id}/linked_comments"
+            expect(response.parsed_body).to eq(
+              {
+                "user" => {
+                  "username" => current_user.username,
+                  "display_name" => current_user.display_name
+                },
+                "comments" => [
+                  {
+                    "id" => user_comment.id,
+                    "text" => user_comment.text,
+                    "created_at" => user_comment.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                    "post_type" => "CommentRepost",
+                    "like_count" => user_comment_like_count + 1,
+                    "repost_count" => user_comment_repost_count + 1,
+                    "comment_count" => user_comment_comment_count,
+                    "post_date" => current_user_repost2.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                    "reposted_by" => "You",
+                    "user_liked" => true,
+                    "user_reposted" => true,
+                    "user_followed" => true,
+                    "replying_to" => [user_comment.post.author.username],
+                    "author" => {
+                      "id" => user_comment.author_id,
+                      "username" => user_comment.author.username,
+                      "display_name" => user_comment.author.display_name
+                    }
+                  },
+                  {
+                    "id" => reposted_reply.id,
+                    "text" => reposted_reply.text,
+                    "created_at" => reposted_reply.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                    "post_type" => "CommentRepost",
+                    "like_count" => reposted_reply_like_count,
+                    "repost_count" => reposted_reply_repost_count + 1 + 1,
+                    "comment_count" => reposted_reply_comment_count,
+                    "post_date" => current_user_repost1.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+                    "reposted_by" => "You",
+                    "user_liked" => false,
+                    "user_reposted" => true,
+                    "user_followed" => true,
+                    "replying_to" => [reposted_reply.parent.author.username, reposted_reply.post.author.username],
+                    "author" => {
+                      "id" => reposted_reply.author_id,
+                      "username" => reposted_reply.author.username,
+                      "display_name" => reposted_reply.author.display_name
+                    }
+                  }
+                ]
+              }
+            )
+          end
         end
       end
     end
