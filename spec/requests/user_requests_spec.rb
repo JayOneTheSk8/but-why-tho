@@ -9,6 +9,7 @@ RSpec.describe "User Requests" do
         "username" => user.username,
         "display_name" => user.display_name,
         "email" => user.email,
+        "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
         "following_count" => 0,
         "follower_count" => 0
       }
@@ -42,6 +43,7 @@ RSpec.describe "User Requests" do
             "username" => user.username,
             "display_name" => user.display_name,
             "email" => user.email,
+            "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "following_count" => following_count,
             "follower_count" => follower_count
           }
@@ -85,6 +87,7 @@ RSpec.describe "User Requests" do
               "username" => user.username,
               "display_name" => updated_display_name,
               "email" => updated_email,
+              "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
               "following_count" => 0,
               "follower_count" => 0
             }
@@ -104,6 +107,7 @@ RSpec.describe "User Requests" do
               "username" => user.username,
               "display_name" => updated_display_name,
               "email" => updated_email,
+              "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
               "following_count" => 0,
               "follower_count" => 0
             }
