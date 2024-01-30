@@ -176,6 +176,7 @@ class User < ApplicationRecord
             reposts.created_at as reposted_at,
             reposts.type as repost_type,
             reposts.message_id as message_id,
+            reposter.username as reposter_username,
             reposter.display_name as reposter_display_name,
             reposter.id as reposter_id
           FROM reposts
@@ -240,6 +241,14 @@ class User < ApplicationRecord
                 NULL
               END
             ) reposted_by,
+            (
+              CASE
+              WHEN user_reposts.repost_id IS NOT NULL
+                THEN user_reposts.reposter_username
+              ELSE
+                NULL
+              END
+            ) reposted_by_username,
             COUNT(
               CASE
               WHEN post_comments.parent_id IS NULL
@@ -276,6 +285,7 @@ class User < ApplicationRecord
             current_user_subscriptions.follow_id,
             user_reposts.repost_id,
             user_reposts.reposter_display_name,
+            user_reposts.reposter_username,
             user_reposts.reposter_id
         ), liked_comments as (
           SELECT
@@ -338,6 +348,14 @@ class User < ApplicationRecord
                 NULL
               END
             ) reposted_by,
+            (
+              CASE
+              WHEN user_reposts.repost_id IS NOT NULL
+                THEN user_reposts.reposter_username
+              ELSE
+                NULL
+              END
+            ) reposted_by_username,
             COUNT(comment_replies.id) as comment_count
           FROM comments
           INNER JOIN users comment_authors
@@ -380,6 +398,7 @@ class User < ApplicationRecord
             current_user_subscriptions.follow_id,
             user_reposts.repost_id,
             user_reposts.reposter_display_name,
+            user_reposts.reposter_username,
             user_reposts.reposter_id
         ), merged as (
           SELECT * FROM liked_posts
@@ -433,6 +452,7 @@ class User < ApplicationRecord
         comment_count: result["comment_count"],
         liked_at: result["liked_at"],
         reposted_by: result["reposted_by"],
+        reposted_by_username: result["reposted_by_username"],
         user_liked: result["user_liked"],
         user_reposted: result["user_reposted"],
         user_followed: result["user_followed"],
@@ -479,6 +499,7 @@ class User < ApplicationRecord
             reposts.created_at as reposted_at,
             reposts.type as repost_type,
             reposts.message_id as message_id,
+            reposter.username as reposter_username,
             reposter.display_name as reposter_display_name,
             reposter.id as reposter_id
           FROM reposts
@@ -501,6 +522,7 @@ class User < ApplicationRecord
               ELSE user_reposts.reposter_display_name
               END
             ) as reposted_by,
+            user_reposts.reposter_username as reposted_by_username,
             user_reposts.repost_type as post_type,
             user_reposts.repost_type as repost_type,
             'PostLike' as like_type,
@@ -557,6 +579,7 @@ class User < ApplicationRecord
             user_reposts.repost_type,
             user_reposts.reposted_at,
             user_reposts.reposter_display_name,
+            user_reposts.reposter_username,
             user_reposts.reposter_id,
             current_user_likes.like_id,
             current_user_reposts.repost_id,
@@ -577,6 +600,7 @@ class User < ApplicationRecord
               ELSE user_reposts.reposter_display_name
               END
             ) as reposted_by,
+            user_reposts.reposter_username as reposted_by_username,
             user_reposts.repost_type as post_type,
             user_reposts.repost_type as repost_type,
             'CommentLike' as like_type,
@@ -647,6 +671,7 @@ class User < ApplicationRecord
             user_reposts.repost_type,
             user_reposts.reposted_at,
             user_reposts.reposter_display_name,
+            user_reposts.reposter_username,
             user_reposts.reposter_id,
             current_user_likes.like_id,
             current_user_reposts.repost_id,
@@ -664,6 +689,7 @@ class User < ApplicationRecord
             post_authors.display_name as author_display_name,
             posts.created_at as post_date,
             NULL as reposted_by,
+            NULL as reposted_by_username,
             'Post' as post_type,
             'PostRepost' as repost_type,
             'PostLike' as like_type,
@@ -772,6 +798,7 @@ class User < ApplicationRecord
         comment_count: result["comment_count"],
         post_date: result["post_date"],
         reposted_by: result["reposted_by"],
+        reposted_by_username: result["reposted_by_username"],
         user_liked: result["user_liked"],
         user_reposted: result["user_reposted"],
         user_followed: result["user_followed"],
@@ -818,6 +845,7 @@ class User < ApplicationRecord
             reposts.created_at as reposted_at,
             reposts.type as repost_type,
             reposts.message_id as message_id,
+            reposter.username as reposter_username,
             reposter.display_name as reposter_display_name,
             reposter.id as reposter_id
           FROM reposts
@@ -840,6 +868,7 @@ class User < ApplicationRecord
               ELSE user_reposts.reposter_display_name
               END
             ) as reposted_by,
+            user_reposts.reposter_username as reposted_by_username,
             user_reposts.repost_type as post_type,
             user_reposts.repost_type as repost_type,
             'CommentLike' as like_type,
@@ -910,6 +939,7 @@ class User < ApplicationRecord
             user_reposts.repost_type,
             user_reposts.reposted_at,
             user_reposts.reposter_display_name,
+            user_reposts.reposter_username,
             user_reposts.reposter_id,
             current_user_likes.like_id,
             current_user_reposts.repost_id,
@@ -927,6 +957,7 @@ class User < ApplicationRecord
             comment_authors.display_name as author_display_name,
             comments.created_at as post_date,
             NULL as reposted_by,
+            NULL as reposted_by_username,
             'Comment' as post_type,
             'CommentRepost' as repost_type,
             'CommentLike' as like_type,
@@ -1051,6 +1082,7 @@ class User < ApplicationRecord
         post_date: result["post_date"],
         user_liked: result["user_liked"],
         reposted_by: result["reposted_by"],
+        reposted_by_username: result["reposted_by_username"],
         user_reposted: result["user_reposted"],
         user_followed: result["user_followed"],
         replying_to: result["replying_to"].presence&.split(",")&.uniq,
@@ -1081,6 +1113,7 @@ class User < ApplicationRecord
             reposts.type as repost_type,
             reposts.message_id as message_id,
             reposter.display_name as reposter_display_name,
+            reposter.username as reposter_username,
             reposter.id as reposter_id
           FROM reposts
           INNER JOIN users reposter
@@ -1107,6 +1140,7 @@ class User < ApplicationRecord
             reposts.type as repost_type,
             reposts.message_id as message_id,
             reposter.display_name as reposter_display_name,
+            reposter.username as reposter_username,
             reposter.id as reposter_id
           FROM reposts
           INNER JOIN users reposter
@@ -1125,6 +1159,7 @@ class User < ApplicationRecord
             followee_reposts.repost_type as post_type,
             followee_reposts.repost_type as repost_type,
             followee_reposts.reposter_display_name as reposted_by,
+            followee_reposts.reposter_username as reposted_by_username,
             'PostLike' as like_type,
             NULL as replying_to,
             (
@@ -1179,6 +1214,7 @@ class User < ApplicationRecord
             followee_reposts.repost_type,
             followee_reposts.reposted_at,
             followee_reposts.reposter_display_name,
+            followee_reposts.reposter_username,
             current_user_likes.like_id,
             current_user_reposts.repost_id,
             current_user_subscriptions.follow_id
@@ -1194,6 +1230,7 @@ class User < ApplicationRecord
             followee_reposts.repost_type as post_type,
             followee_reposts.repost_type as repost_type,
             followee_reposts.reposter_display_name as reposted_by,
+            followee_reposts.reposter_username as reposted_by_username,
             'CommentLike' as like_type,
             array_to_string(
               ARRAY[
@@ -1262,6 +1299,7 @@ class User < ApplicationRecord
             followee_reposts.repost_type,
             followee_reposts.reposted_at,
             followee_reposts.reposter_display_name,
+            followee_reposts.reposter_username,
             parent_comment.id,
             comment_post_author.username,
             parent_comment_author.username,
@@ -1280,6 +1318,7 @@ class User < ApplicationRecord
             'Post' as post_type,
             'PostRepost' as repost_type,
             NULL as reposted_by,
+            NULL as reposted_by_username,
             'PostLike' as like_type,
             NULL as replying_to,
             (
@@ -1343,6 +1382,7 @@ class User < ApplicationRecord
             current_user_reposts.repost_type as post_type,
             current_user_reposts.repost_type as repost_type,
             'You' as reposted_by,
+            current_user_reposts.reposter_username as reposted_by_username,
             'PostLike' as like_type,
             NULL as replying_to,
             (
@@ -1388,6 +1428,7 @@ class User < ApplicationRecord
             current_user_reposts.repost_id,
             current_user_reposts.reposted_at,
             current_user_reposts.reposter_display_name,
+            current_user_reposts.reposter_username,
             current_user_reposts.repost_type,
             current_user_subscriptions.follow_id
         ), user_reposted_comments as (
@@ -1402,6 +1443,7 @@ class User < ApplicationRecord
             current_user_reposts.repost_type as post_type,
             current_user_reposts.repost_type as repost_type,
             'You' as reposted_by,
+            current_user_reposts.reposter_username as reposted_by_username,
             'CommentLike' as like_type,
             array_to_string(
               ARRAY[
@@ -1461,6 +1503,7 @@ class User < ApplicationRecord
             current_user_reposts.repost_type,
             current_user_reposts.reposted_at,
             current_user_reposts.reposter_display_name,
+            current_user_reposts.reposter_username,
             current_user_subscriptions.follow_id,
             current_user_likes.like_id,
             parent_comment.id,
@@ -1478,6 +1521,7 @@ class User < ApplicationRecord
             'Post' as post_type,
             'PostRepost' as repost_type,
             NULL as reposted_by,
+            NULL as reposted_by_username,
             'PostLike' as like_type,
             NULL as replying_to,
             (
@@ -1589,6 +1633,7 @@ class User < ApplicationRecord
         comment_count: result["comment_count"],
         post_date: result["post_date"],
         reposted_by: result["reposted_by"],
+        reposted_by_username: result["reposted_by_username"],
         user_liked: result["user_liked"],
         user_reposted: result["user_reposted"],
         user_followed: result["user_followed"],
