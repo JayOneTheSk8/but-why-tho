@@ -11,6 +11,7 @@ RSpec.describe "User Requests" do
         "email" => user.email,
         "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
         "post_count" => 0,
+        "current_user_following" => false,
         "following_count" => 0,
         "follower_count" => 0
       }
@@ -46,6 +47,7 @@ RSpec.describe "User Requests" do
             "email" => user.email,
             "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "post_count" => 0,
+            "current_user_following" => false,
             "following_count" => following_count,
             "follower_count" => follower_count
           }
@@ -71,8 +73,51 @@ RSpec.describe "User Requests" do
             "email" => user.email,
             "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
             "post_count" => post_count,
+            "current_user_following" => false,
             "following_count" => 0,
             "follower_count" => 0
+          }
+        )
+      end
+    end
+
+    context "when current user is following the user" do
+      let!(:current_user) { create(:user) }
+
+      before do
+        post("/sign_in", params: {user: {login: current_user.username, password: current_user.password}})
+      end
+
+      it "returns if the current user follows the user" do
+        get "/users/#{user.username}"
+        expect(response.parsed_body).to eq(
+          {
+            "id" => user.id,
+            "username" => user.username,
+            "display_name" => user.display_name,
+            "email" => user.email,
+            "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+            "post_count" => 0,
+            "current_user_following" => false,
+            "following_count" => 0,
+            "follower_count" => 0
+          }
+        )
+
+        create(:follow, follower: current_user, followee: user)
+
+        get "/users/#{user.username}"
+        expect(response.parsed_body).to eq(
+          {
+            "id" => user.id,
+            "username" => user.username,
+            "display_name" => user.display_name,
+            "email" => user.email,
+            "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
+            "post_count" => 0,
+            "current_user_following" => true,
+            "following_count" => 0,
+            "follower_count" => 1
           }
         )
       end
@@ -116,6 +161,7 @@ RSpec.describe "User Requests" do
               "email" => updated_email,
               "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
               "post_count" => 0,
+              "current_user_following" => false,
               "following_count" => 0,
               "follower_count" => 0
             }
@@ -137,6 +183,7 @@ RSpec.describe "User Requests" do
               "email" => updated_email,
               "created_at" => user.created_at.strftime("%Y-%m-%dT%T.%LZ"),
               "post_count" => 0,
+              "current_user_following" => false,
               "following_count" => 0,
               "follower_count" => 0
             }
