@@ -163,6 +163,8 @@ Get the data of the `User`.
   "username": <string>
   "display_name": <string>
   "email": <string>
+  "current_user_following": <boolean>
+  "post_count": <int>
   "following_count": <int>
   "follower_count": <int>
 }
@@ -177,6 +179,8 @@ Edits the `User`.
   "username": <string>
   "display_name": <string>
   "email": <string>
+  "current_user_following": <boolean>
+  "post_count": <int>
   "following_count": <int>
   "follower_count": <int>
 }
@@ -414,6 +418,7 @@ Gets all `User`'s created `Post`s and reposted `Post`s and `Comment`s
       "comment_count": <int>
       "post_date": <datetime> # datetime of post creation or repost
       "reposted_by": <string> # display name of reposter; optional
+      "reposted_by_username": <string> # username of reposter; optional
       "user_liked": <boolean> # current user liked
       "user_reposted": <boolean> # current user reposted
       "user_followed": <boolean> # current user following author
@@ -478,6 +483,7 @@ Gets the most popular posts and reposted comments by date and popularity; filter
       "comment_count": <int>
       "post_date": <datetime>
       "reposted_by": <string>
+      "reposted_by_username": <string>
       "user_liked": <boolean>
       "user_reposted": <boolean>
       "user_followed": <boolean>
@@ -851,6 +857,7 @@ Gets the `User`'s created and reposted `Comment`s.
       "post_date": <datetime>
       "user_liked": <boolean>
       "reposted_by": <string>
+      "reposted_by_username": <string>
       "user_reposted": <boolean>
       "user_followed": <boolean>
       "replying_to": <string[]>
@@ -1052,6 +1059,7 @@ Gets the `Post`s and `Comment`s the `User` liked in order of `Like`.
       "comment_count": <int>
       "liked_at": <datetime>
       "reposted_by": <string>
+      "reposted_by_username": <string>
       "user_liked": <boolean>
       "user_reposted": <boolean>
       "user_followed": <boolean>
