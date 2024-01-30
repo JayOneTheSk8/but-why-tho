@@ -435,7 +435,7 @@ Gets all `User`'s created `Post`s and reposted `Post`s and `Comment`s
 ```
 
 ### GET /front_page
-Gets the most popular `Post`s and reposted `Comment`s by date and popularity.
+Gets the most popular `Post`s and reposted (at least 5 times) `Comment`s by date and popularity.
 
 #### Response
 ```yaml
