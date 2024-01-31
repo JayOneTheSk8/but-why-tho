@@ -48,8 +48,8 @@ Table of Contents
   - [Follows](#follows)
     - [POST /follows](#post-follows)
     - [DELETE /follows](#delete-follows)
-    - [GET /users/:user_id/subscriptions](#get-usersuser_idsubscriptions)
-    - [GET /users/:user_id/followers](#get-usersuser_idfollowers)
+    - [GET /users/:username/subscriptions](#get-usersusernamesubscriptions)
+    - [GET /users/:username/followers](#get-usersusernamefollowers)
 
 Installation
 ===================
@@ -1203,7 +1203,7 @@ Deletes a `Follow`.
 }
 ```
 
-### GET /users/:user_id/subscriptions
+### GET /users/:username/subscriptions
 Gets the `User`s the `User` is following.
 
 #### Response
@@ -1225,7 +1225,7 @@ Gets the `User`s the `User` is following.
 }
 ```
 
-### GET /users/:user_id/followers
+### GET /users/:username/followers
 Gets the `User`s that follow the `User`.
 
 #### Response

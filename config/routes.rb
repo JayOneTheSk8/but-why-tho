@@ -43,6 +43,7 @@ Rails.application.routes.draw do
   get "users/:user_id/linked_posts", to: "posts#user_linked_posts", format: "json"
   get "users/:user_id/linked_comments", to: "comments#user_linked_comments", format: "json"
   get "users/:user_id/likes", to: "likes#user_likes", format: "json"
-  get "users/:user_id/subscriptions", to: "follows#followed_users", format: "json"
-  get "users/:user_id/followers", to: "follows#followers", format: "json"
+
+  get "users/:username/subscriptions", to: "follows#followed_users", format: "json"
+  get "users/:username/followers", to: "follows#followers", format: "json"
 end

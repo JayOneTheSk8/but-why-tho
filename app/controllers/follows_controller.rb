@@ -39,7 +39,7 @@ class FollowsController < ApplicationController
   end
 
   def followed_users
-    @user = User.find_by(id: params[:user_id])
+    @user = User.find_by(username: params[:username])
 
     if @user.present?
       @followed_users = @user.followed_users
@@ -80,7 +80,7 @@ class FollowsController < ApplicationController
   end
 
   def followers
-    @user = User.find_by(id: params[:user_id])
+    @user = User.find_by(username: params[:username])
 
     if @user.present?
       @followers = @user.followers

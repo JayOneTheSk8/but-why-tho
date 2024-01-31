@@ -146,7 +146,7 @@ RSpec.describe "Follow Requests" do
     end
   end
 
-  describe "GET users/:user_id/subscriptions" do
+  describe "GET users/:username/subscriptions" do
     let!(:user) { create(:user) }
 
     let!(:followed_user1) { create(:user) }
@@ -162,7 +162,7 @@ RSpec.describe "Follow Requests" do
     end
 
     it "returns the user's followed users sorted by follow creation" do
-      get "/users/#{user.id}/subscriptions"
+      get "/users/#{user.username}/subscriptions"
 
       expect(response.parsed_body).to eq(
         {
@@ -209,7 +209,7 @@ RSpec.describe "Follow Requests" do
         end
 
         it "notates them" do
-          get "/users/#{user.id}/subscriptions"
+          get "/users/#{user.username}/subscriptions"
 
           expect(response.parsed_body).to eq(
             {
@@ -251,7 +251,7 @@ RSpec.describe "Follow Requests" do
         end
 
         it "notates them" do
-          get "/users/#{user.id}/subscriptions"
+          get "/users/#{user.username}/subscriptions"
 
           expect(response.parsed_body).to eq(
             {
@@ -296,7 +296,7 @@ RSpec.describe "Follow Requests" do
     end
   end
 
-  describe "GET users/:user_id/followers" do
+  describe "GET users/:username/followers" do
     let!(:user) { create(:user) }
 
     let!(:follower1) { create(:user) }
@@ -312,7 +312,7 @@ RSpec.describe "Follow Requests" do
     end
 
     it "returns the user's followers" do
-      get "/users/#{user.id}/followers"
+      get "/users/#{user.username}/followers"
 
       expect(response.parsed_body).to eq(
         {
@@ -359,7 +359,7 @@ RSpec.describe "Follow Requests" do
         end
 
         it "notates them" do
-          get "/users/#{user.id}/followers"
+          get "/users/#{user.username}/followers"
 
           expect(response.parsed_body).to eq(
             {
@@ -401,7 +401,7 @@ RSpec.describe "Follow Requests" do
         end
 
         it "notates them" do
-          get "/users/#{user.id}/followers"
+          get "/users/#{user.username}/followers"
 
           expect(response.parsed_body).to eq(
             {
