@@ -173,6 +173,17 @@ Get the data of the `User`.
 ### PUT /users/:id
 Edits the `User`.
 
+#### Request
+```yaml
+{
+  "user": {
+    "display_name": <string>
+    "email": <string>
+  }
+}
+```
+
+#### Response
 ```yaml
 {
   "id": <bigint>
