@@ -29,3 +29,7 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# SSL key & certificate
+config/ssl/localhost.crt
+config/ssl/localhost.key
