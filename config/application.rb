@@ -36,7 +36,11 @@ module ButWhyTho
       :cookie_store,
       key: "_but_why_tho_session",
       expire_after: 14.days,
-      httponly: true
+      httponly: true,
+      domain: :all,
+      same_site: :none,
+      secure: true,
+      tld_length: 2
     )
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use config.session_store, config.session_options
