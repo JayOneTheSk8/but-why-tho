@@ -77,6 +77,27 @@ bin/rubocop
 bin/rspec
 ```
 
+## Set up for HTTPS (Required for cross-site browser cookies)
+
+Install [`openssl`](https://www.openssl.org/)
+
+```sh
+# via Ubunutu
+sudo apt install openssl
+```
+
+Create local key/certificate
+
+```sh
+# From top-repo level (lasts 1 year)
+openssl req -x509 -sha256 -nodes -newkey rsa:2048 -keyout config/ssl/localhost.key -out config/ssl/localhost.crt -subj  "/CN=localhost" -days 365
+```
+
+Run server via puma config
+```sh
+bundle exec puma -C config/puma.rb
+```
+
 API Specs
 ===================
 
