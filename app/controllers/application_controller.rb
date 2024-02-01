@@ -17,6 +17,7 @@ class ApplicationController < ActionController::API
   def logout!
     current_user&.reset_session_token!
     session[:session_token] = nil
+    reset_session
   end
 
   private
