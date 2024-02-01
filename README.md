@@ -1,6 +1,6 @@
-# Why? (Server)
+# Y (Server)
 
-`Why` is a platform for posting questions and asking more. Users can create posts and comments as long as they're all questions, encouraging deeper thought. Users can also follow each other and like and repost posts and comments. Posts and highly reposted comments are aggregated onto the front page. For a currated list, a user can view a front page their followed users.
+`Why` is a platform for posting questions and asking more. Users can create posts and comments as long as they're all questions, encouraging deeper thought. Users can also follow each other and like and repost posts and comments. Posts and highly reposted comments are aggregated onto the front page. For a currated list, a user can view a front page of their followed users.
 
 Table of Contents
 ===================
