@@ -37,7 +37,6 @@ module ButWhyTho
       key: "_but_why_tho_session",
       expire_after: 14.days,
       httponly: true,
-      domain: :all,
       same_site: :none,
       secure: true,
       tld_length: 2
