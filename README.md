@@ -50,6 +50,12 @@ Table of Contents
     - [DELETE /follows](#delete-follows)
     - [GET /users/:username/subscriptions](#get-usersusernamesubscriptions)
     - [GET /users/:username/followers](#get-usersusernamefollowers)
+  - [Search](#search)
+    - [GET /search/quick](#get-searchquick)
+    - [GET /search/top](#get-searchtop)
+    - [GET /search/users](#get-searchusers)
+    - [GET /search/posts](#get-searchposts)
+    - [GET /search/comments](#get-searchcomments)
 
 Installation
 ===================
@@ -1273,6 +1279,229 @@ Gets the `User`s that follow the `User`.
       "display_name": <string>
       "following_current_user": <boolean>
       "current_user_following": <boolean>
+    }
+    ...
+  ]
+}
+```
+
+## Search
+
+### GET /search/quick
+Does a quick search of the top 6 most popular/active `User`s with the search text in their `username` or `display_name`.
+
+#### Request
+```yaml
+{
+  "search": {
+    "text": <string>
+  }
+}
+```
+
+#### Response
+```yaml
+{
+  "users": [
+    {
+      "id": <bigint>
+      "username": <string>
+      "display_name": <string>
+      "current_user_following": <boolean>
+      "following_current_user": <boolean>
+      "follower_count": <int>
+      "followed_user_count": <int>
+      "user_rating": <int>
+    }
+    ...
+  ]
+}
+```
+
+### GET /search/top
+Does a search of the top 3 most popular/active `User`s with the search text in their `username` or `display_name` and top 3 popular `Post`s and `Comment`s with the search text in their `text`.
+
+#### Request
+```yaml
+{
+  "search": {
+    "text": <string>
+  }
+}
+```
+
+#### Response
+```yaml
+{
+  "users": [
+    {
+      "id": <bigint>
+      "username": <string>
+      "display_name": <string>
+      "current_user_following": <boolean>
+      "following_current_user": <boolean>
+      "follower_count": <int>
+      "followed_user_count": <int>
+      "user_rating": <int>
+    }
+    ...
+  ]
+  "posts": [
+    {
+      "id": <bigint>
+      "text": <string>
+      "created_at": <datetime>
+      "post_type": "Post"
+      "like_count": <int>
+      "repost_count": <int>
+      "comment_count": <int>
+      "post_date": <datetime>
+      "user_liked": <boolean>
+      "user_reposted": <boolean>
+      "user_followed": <boolean>
+      "rating": <int>
+      "replying_to": null
+      "author": {
+        "id": <bigint>
+        "username": <string>
+        "display_name": <string>
+      }
+    }
+    ...
+  ]
+  "comments": [
+    {
+      "id": <bigint>
+      "text": <string>
+      "created_at": <datetime>
+      "post_type": "Comment"
+      "like_count": <int>
+      "repost_count": <int>
+      "comment_count": <int>
+      "post_date": <datetime>
+      "user_liked": <boolean>
+      "user_reposted": <boolean>
+      "user_followed": <boolean>
+      "rating": <int>
+      "replying_to": <string[]>
+      "author": {
+        "id": <bigint>
+        "username": <string>
+        "display_name": <string>
+      }
+    }
+    ...
+  ]
+}
+```
+
+### GET /search/users
+Does a search of the `User`s with the search text in their `username` or `display_name`.
+
+#### Request
+```yaml
+{
+  "search": {
+    "text": <string>
+  }
+}
+```
+
+#### Response
+```yaml
+{
+  "users": [
+    {
+      "id": <bigint>
+      "username": <string>
+      "display_name": <string>
+      "current_user_following": <boolean>
+      "following_current_user": <boolean>
+      "follower_count": <int>
+      "followed_user_count": <int>
+      "user_rating": <int>
+    }
+    ...
+  ]
+}
+```
+
+### GET /search/posts
+Does a search of the `Post`s with the search text in their `text`.
+
+#### Request
+```yaml
+{
+  "search": {
+    "text": <string>
+  }
+}
+```
+
+#### Response
+```yaml
+{
+  "posts": [
+    {
+      "id": <bigint>
+      "text": <string>
+      "created_at": <datetime>
+      "post_type": "Post"
+      "like_count": <int>
+      "repost_count": <int>
+      "comment_count": <int>
+      "post_date": <datetime>
+      "user_liked": <boolean>
+      "user_reposted": <boolean>
+      "user_followed": <boolean>
+      "rating": <int>
+      "replying_to": null
+      "author": {
+        "id": <bigint>
+        "username": <string>
+        "display_name": <string>
+      }
+    }
+    ...
+  ]
+}
+```
+
+### GET /search/comments
+Does a search of the `Comment`s with the search text in their `text`.
+
+#### Request
+```yaml
+{
+  "search": {
+    "text": <string>
+  }
+}
+```
+
+#### Response
+```yaml
+{
+  "comments": [
+    {
+      "id": <bigint>
+      "text": <string>
+      "created_at": <datetime>
+      "post_type": "Comment"
+      "like_count": <int>
+      "repost_count": <int>
+      "comment_count": <int>
+      "post_date": <datetime>
+      "user_liked": <boolean>
+      "user_reposted": <boolean>
+      "user_followed": <boolean>
+      "rating": <int>
+      "replying_to": <string[]>
+      "author": {
+        "id": <bigint>
+        "username": <string>
+        "display_name": <string>
+      }
     }
     ...
   ]
