@@ -133,6 +133,222 @@ RSpec.describe User do
     end
   end
 
+  describe ".search_users" do
+    let(:substring) { "cool" }
+
+    let(:user1_username) { "Cool" }
+    let(:user2_username) { "scool_Izfun" }
+
+    let(:user3_display_name) { "Cool man" }
+    let(:user4_display_name) { "You ain't cool" }
+
+    let!(:user1) { create(:user, username: user1_username) }
+    let!(:user2) { create(:user, username: user2_username) }
+    let!(:user3) { create(:user, display_name: user3_display_name) }
+    let!(:user4) { create(:user, display_name: user4_display_name) }
+
+    before do
+      # User1 4 followers and 2 followed users = rating 14
+      create_list(:follow, 4, followee: user1)
+      create_list(:follow, 2, follower: user1)
+
+      # User2 2 followers and 1 followed user = rating 7
+      create_list(:follow, 2, followee: user2)
+      create_list(:follow, 1, follower: user2)
+
+      # User3 1 followers and 5 followed users = rating 8
+      create_list(:follow, 1, followee: user3)
+      create_list(:follow, 5, follower: user3)
+
+      # User4 3 followers and 3 followed users = rating 12
+      create_list(:follow, 3, followee: user4)
+      create_list(:follow, 3, follower: user4)
+    end
+
+    it "finds users whose usernames or display names contain the passed substring" do
+      expect(described_class.search_users(substring))
+        .to eq(
+          [
+            {
+              "id" => user1.id,
+              "username" => user1.username,
+              "display_name" => user1.display_name,
+              "current_user_following" => false,
+              "following_current_user" => false,
+              "follower_count" => 4,
+              "followed_user_count" => 2,
+              "user_rating" => 14
+            },
+            {
+              "id" => user4.id,
+              "username" => user4.username,
+              "display_name" => user4.display_name,
+              "current_user_following" => false,
+              "following_current_user" => false,
+              "follower_count" => 3,
+              "followed_user_count" => 3,
+              "user_rating" => 12
+            },
+            {
+              "id" => user3.id,
+              "username" => user3.username,
+              "display_name" => user3.display_name,
+              "current_user_following" => false,
+              "following_current_user" => false,
+              "follower_count" => 1,
+              "followed_user_count" => 5,
+              "user_rating" => 8
+            },
+            {
+              "id" => user2.id,
+              "username" => user2.username,
+              "display_name" => user2.display_name,
+              "current_user_following" => false,
+              "following_current_user" => false,
+              "follower_count" => 2,
+              "followed_user_count" => 1,
+              "user_rating" => 7
+            }
+          ]
+        )
+    end
+
+    context "with limit" do
+      it "returns a certain amount of users" do
+        expect(described_class.search_users(substring, limit: 2))
+          .to eq(
+            [
+              {
+                "id" => user1.id,
+                "username" => user1.username,
+                "display_name" => user1.display_name,
+                "current_user_following" => false,
+                "following_current_user" => false,
+                "follower_count" => 4,
+                "followed_user_count" => 2,
+                "user_rating" => 14
+              },
+              {
+                "id" => user4.id,
+                "username" => user4.username,
+                "display_name" => user4.display_name,
+                "current_user_following" => false,
+                "following_current_user" => false,
+                "follower_count" => 3,
+                "followed_user_count" => 3,
+                "user_rating" => 12
+              }
+            ]
+          )
+      end
+    end
+
+    context "with current user" do
+      let!(:user5) { create(:user) }
+
+      before do
+        create(:follow, followee: user5, follower: user1)
+        create(:follow, followee: user3, follower: user5)
+      end
+
+      it "returns whether or not the user follows the current user or vice versa; prioritizing followed users" do
+        expect(described_class.search_users(substring, current_user: user5))
+          .to eq(
+            [
+              {
+                "id" => user3.id,
+                "username" => user3.username,
+                "display_name" => user3.display_name,
+                "current_user_following" => true,
+                "following_current_user" => false,
+                "follower_count" => 1 + 1,
+                "followed_user_count" => 5,
+                "user_rating" => 8 + 3 + 15
+              },
+              {
+                "id" => user1.id,
+                "username" => user1.username,
+                "display_name" => user1.display_name,
+                "current_user_following" => false,
+                "following_current_user" => true,
+                "follower_count" => 4,
+                "followed_user_count" => 2 + 1,
+                "user_rating" => 14 + 1
+              },
+              {
+                "id" => user4.id,
+                "username" => user4.username,
+                "display_name" => user4.display_name,
+                "current_user_following" => false,
+                "following_current_user" => false,
+                "follower_count" => 3,
+                "followed_user_count" => 3,
+                "user_rating" => 12
+              },
+              {
+                "id" => user2.id,
+                "username" => user2.username,
+                "display_name" => user2.display_name,
+                "current_user_following" => false,
+                "following_current_user" => false,
+                "follower_count" => 2,
+                "followed_user_count" => 1,
+                "user_rating" => 7
+              }
+            ]
+          )
+      end
+
+      it "priotitizes the current user in the search results" do
+        expect(described_class.search_users(substring, current_user: user2))
+          .to eq(
+            [
+              {
+                "id" => user2.id,
+                "username" => user2.username,
+                "display_name" => user2.display_name,
+                "current_user_following" => false,
+                "following_current_user" => false,
+                "follower_count" => 2,
+                "followed_user_count" => 1,
+                "user_rating" => 7 + 1000
+              },
+              {
+                "id" => user1.id,
+                "username" => user1.username,
+                "display_name" => user1.display_name,
+                "current_user_following" => false,
+                "following_current_user" => false,
+                "follower_count" => 4,
+                "followed_user_count" => 2 + 1,
+                "user_rating" => 14 + 1
+              },
+              {
+                "id" => user4.id,
+                "username" => user4.username,
+                "display_name" => user4.display_name,
+                "current_user_following" => false,
+                "following_current_user" => false,
+                "follower_count" => 3,
+                "followed_user_count" => 3,
+                "user_rating" => 12
+              },
+              {
+                "id" => user3.id,
+                "username" => user3.username,
+                "display_name" => user3.display_name,
+                "current_user_following" => false,
+                "following_current_user" => false,
+                "follower_count" => 1 + 1,
+                "followed_user_count" => 5,
+                "user_rating" => 8 + 3
+              }
+            ]
+          )
+      end
+    end
+  end
+
   describe "#confirm!" do
     context "with confirmed_at" do
       let!(:u) { create(:user, :confirmed) }

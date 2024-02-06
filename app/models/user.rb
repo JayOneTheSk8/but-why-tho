@@ -143,6 +143,130 @@ class User < ApplicationRecord
     UserMailer.confirmation(self, confirmation_token).deliver_now
   end
 
+  def self.search_users(search_text, current_user: nil, limit: 100)
+    binds = [
+      ActiveRecord::Relation::QueryAttribute.new(
+        "current_user_id",
+        current_user&.id || 0,
+        ActiveRecord::Type::Integer.new
+      ),
+      ActiveRecord::Relation::QueryAttribute.new(
+        "search_text",
+        "%#{search_text.gsub('%', '\\%')}%",
+        ActiveRecord::Type::String.new
+      ),
+      ActiveRecord::Relation::QueryAttribute.new(
+        "search_limit",
+        limit,
+        ActiveRecord::Type::Integer.new
+      )
+    ]
+
+    ActiveRecord::Base.connection.select_all(<<~SQL.squish, "User Search", binds).to_a
+      WITH current_user_followers as (
+        SELECT
+          follows.id as follow_id,
+          follows.follower_id as follower_id
+        FROM follows
+        WHERE follows.followee_id = $1
+      ), current_user_subscriptions as (
+        SELECT
+          follows.id as follow_id,
+          follows.followee_id as followee_id
+        FROM follows
+        WHERE follows.follower_id = $1
+      ), found_users as (
+        SELECT
+          users.id as id,
+          users.username as username,
+          users.display_name as display_name,
+          (
+            CASE
+            WHEN current_user_subscriptions.follow_id IS NOT NULL
+              THEN TRUE
+            ELSE
+              FALSE
+            END
+          ) as current_user_following,
+          (
+            CASE
+            WHEN current_user_followers.follow_id IS NOT NULL
+              THEN TRUE
+            ELSE
+              FALSE
+            END
+          ) as following_current_user
+        FROM users
+        LEFT OUTER JOIN follows followers
+          ON followers.followee_id = users.id
+        LEFT OUTER JOIN follows followed_users
+          ON followed_users.follower_id = users.id
+        LEFT OUTER JOIN current_user_subscriptions
+          ON current_user_subscriptions.followee_id = users.id
+        LEFT OUTER JOIN current_user_followers
+          ON current_user_followers.follower_id = users.id
+        WHERE username ILIKE $2 OR display_name ILIKE $2
+        GROUP BY
+          users.id,
+          current_user_subscriptions.follow_id,
+          current_user_followers.follow_id
+      ), follower_counts as (
+        SELECT
+          COUNT(follows.id) as follower_count,
+          follows.followee_id as user_id
+        FROM follows
+        INNER JOIN found_users
+          ON found_users.id = follows.followee_id
+        GROUP BY
+          follows.followee_id
+      ), followed_user_counts as (
+        SELECT
+          COUNT(follows.id) as followed_user_count,
+          follows.follower_id as user_id
+        FROM follows
+        INNER JOIN found_users
+          ON found_users.id = follows.follower_id
+        GROUP BY
+          follows.follower_id
+      )
+      SELECT
+        found_users.*,
+        COALESCE(follower_counts.follower_count, 0) as follower_count,
+        COALESCE(followed_user_counts.followed_user_count, 0) as followed_user_count,
+        (
+          (
+            CASE
+            WHEN found_users.id = $1
+              THEN 1000
+            ELSE
+              0
+            END
+          ) +
+          (
+            CASE
+            WHEN current_user_subscriptions.follow_id IS NOT NULL
+              THEN 15
+            ELSE
+              0
+            END
+          ) +
+          (COALESCE(follower_counts.follower_count, 0) * 3) +
+          (COALESCE(followed_user_counts.followed_user_count, 0) * 1)
+        ) as user_rating
+      FROM found_users
+      LEFT OUTER JOIN follower_counts
+        ON follower_counts.user_id = found_users.id
+      LEFT OUTER JOIN followed_user_counts
+        ON followed_user_counts.user_id = found_users.id
+      LEFT OUTER JOIN current_user_subscriptions
+        ON current_user_subscriptions.followee_id = found_users.id
+      ORDER BY
+        user_rating DESC,
+        found_users.id DESC
+      LIMIT $3
+    SQL
+  end
+
   def likes(current_user: nil)
     binds = bind_id_with_current_user_id_for_query(current_user)
 
