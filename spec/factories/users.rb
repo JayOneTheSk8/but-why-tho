@@ -13,5 +13,25 @@ FactoryBot.define do
     trait :unconfirmed do
       confirmed_at { nil }
     end
+
+    trait :with_followers do
+      transient do
+        follower_count { 1 }
+      end
+
+      after(:create) do |user, evaluator|
+        create_list(:follow, evaluator.follower_count, followee_id: user.id)
+      end
+    end
+
+    trait :with_followed_users do
+      transient do
+        followed_user_count { 1 }
+      end
+
+      after(:create) do |user, evaluator|
+        create_list(:follow, evaluator.followed_user_count, follower_id: user.id)
+      end
+    end
   end
 end

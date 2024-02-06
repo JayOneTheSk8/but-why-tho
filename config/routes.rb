@@ -46,4 +46,10 @@ Rails.application.routes.draw do
 
   get "users/:username/subscriptions", to: "follows#followed_users", format: "json"
   get "users/:username/followers", to: "follows#followers", format: "json"
+
+  get "search/quick", to: "search#quick", format: "json"
+  get "search/top", to: "search#top", format: "json"
+  get "search/users", to: "search#users", format: "json"
+  get "search/posts", to: "search#posts", format: "json"
+  get "search/comments", to: "search#comments", format: "json"
 end
