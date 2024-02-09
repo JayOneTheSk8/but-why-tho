@@ -1,6 +1,8 @@
 # Y (Server)
 
-`Y` is a platform for posting questions and asking more. Users can create posts and comments as long as they're all questions, encouraging deeper thought. Users can also follow each other and like and repost posts and comments. Posts and highly reposted comments are aggregated onto the front page. For a currated list, a user can view a front page of their followed users.
+![](public/whycon.png)
+
+[Y](https://why-client-6472abb311a5.herokuapp.com/) is a platform for posting questions and asking more. Users can create posts and comments as long as they're all questions, encouraging deeper thought. Users can also follow each other and like and repost posts and comments. Posts and highly reposted comments are aggregated onto the front page. For a currated list, a user can view a front page of their followed users.
 
 Table of Contents
 ===================
